@@ -1,0 +1,7 @@
+.login__body {
+  display: flex;
+  width: 100vw;
+  height: 60vh;
+  align-items: center;
+  justify-content: center;
+}

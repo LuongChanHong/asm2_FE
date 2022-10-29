@@ -1,2 +1,2 @@
 Nội dung app:
-- tạo các model
+- dựng màn hình đăng nhập
