@@ -1,0 +1,2 @@
+Nội dung app:
+- tạo các model
