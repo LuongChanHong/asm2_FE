@@ -1,3 +1,6 @@
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
 import Featured from "../../components/featured/Featured";
 import FeaturedProperties from "../../components/featuredProperties/FeaturedProperties";
 import Footer from "../../components/footer/Footer";
@@ -7,19 +10,28 @@ import Navbar from "../../components/navbar/Navbar";
 import PropertyList from "../../components/propertyList/PropertyList";
 import "./home.css";
 
+import { mainPath } from "../../utils/path";
+
 const Home = () => {
+  const navigate = useNavigate();
+  // useEffect(() => {
+  //   if (!localStorage.currentUser) {
+  //     // window.location.href = mainPath + "/login";
+  //     navigate("/login");
+  //   }
+  // });
   return (
     <div>
       <Navbar />
-      <Header/>
+      <Header />
       <div className="homeContainer">
-        <Featured/>
+        <Featured />
         <h1 className="homeTitle">Browse by property type</h1>
-        <PropertyList/>
+        <PropertyList />
         <h1 className="homeTitle">Homes guests love</h1>
-        <FeaturedProperties/>
-        <MailList/>
-        <Footer/>
+        <FeaturedProperties />
+        <MailList />
+        <Footer />
       </div>
     </div>
   );
