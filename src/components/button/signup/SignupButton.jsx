@@ -1,12 +1,20 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
 import "../../navbar/navbar.css";
 
 const SignupButton = () => {
+  const navigate = useNavigate();
+
+  // const handleClick = () => {
+  //   navigate("/signup");
+  // };
+
   return (
     <section>
-      <form>
-        <button className="navButton">Sign Up</button>
-      </form>
+      <button onClick={() => navigate("/signup")} className="navButton">
+        Sign Up
+      </button>
     </section>
   );
 };

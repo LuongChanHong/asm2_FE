@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
+import Signup from "./pages/signup/Signup";
 import Hotel from "./pages/hotel/Hotel";
 import List from "./pages/list/List";
 
@@ -13,6 +14,8 @@ function App() {
       <Routes>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/login" element={<Login />} />
+        <Route exact path="/signup" element={<Signup />} />
+
         {/* <Route path="/" element={<Home/>}/> */}
         {/* <Route path="/hotels" element={<List/>}/>
         <Route path="/hotels/:id" element={<Hotel/>}/> */}

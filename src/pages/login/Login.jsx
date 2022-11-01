@@ -22,7 +22,8 @@ const Login = () => {
     // console.log("input:", input);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
     // console.log("input:", input);
     fetch(serverPath + "/login", {
       method: "POST",
