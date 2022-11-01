@@ -1,2 +1,2 @@
 Nội dung app:
-- dựng màn hình đăng ký
+- thêm chức năng logout

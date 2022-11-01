@@ -4,6 +4,7 @@ import "./navbar.css";
 // import LoginButton from "../button/loginButton/LoginButton";
 import SignupButton from "../button/signup/SignupButton";
 import TransactionButton from "../button/transaction/TransactionButton";
+import LoginButton from "../button/login/LoginButton";
 import LogoutButton from "../button/logout/LogoutButton";
 
 const Navbar = () => {
@@ -26,6 +27,7 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="navItems">
+            <LoginButton />
             <SignupButton />
           </div>
         )}
