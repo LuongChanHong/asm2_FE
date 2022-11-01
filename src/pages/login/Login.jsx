@@ -2,50 +2,45 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "./login.css";
-import { mainPath, serverPath } from "../../utils/path";
+import { serverPath } from "../../utils/path";
 
 import Navbar from "../../components/navbar/Navbar";
 
 const Login = () => {
   const [input, setInput] = useState({ email: "", password: "" });
-  const [user, setUser] = useState({});
+  // const [user, setUser] = useState({});
+  const [loginError, setLoginError] = useState(false);
 
-  const onChange = (event) => {
+  const navigate = useNavigate();
+
+  const handleChange = (event) => {
     const target = event.target;
     const name = target.name;
     const value = target.value;
     setInput({ ...input, [name]: value });
-    console.log("============");
-    console.log("input:", input);
+    // console.log("============");
+    // console.log("input:", input);
   };
 
-  const onSubmit = (event) => {
+  const handleSubmit = () => {
     // console.log("input:", input);
-
-    fetch("http://localhost:5000/login", {
+    fetch(serverPath + "/login", {
       method: "POST",
       body: JSON.stringify(input),
       headers: { "Content-Type": "application/json" },
       credentials: "same-origin",
     })
-      .then((response) => {
-        response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
-        localStorage.setItem("data", JSON.stringify(data));
-        if (data != null) {
-          localStorage.setItem("currentUser", JSON.stringify(input));
-          setUser(JSON.parse(localStorage.getItem("currentUser")));
-          localStorage.removeItem("loginError");
-          // navigate("/");
-          window.location.href = "http://localhost:3000/home";
-        } else {
-          localStorage.loginError = true;
-        }
+        // console.log("data:", data);
+        // set user để navbar hiện user hiện tại
+        localStorage.setItem("currentUser", JSON.stringify(input));
+        setLoginError(false);
+        navigate("/home");
       })
       .catch((err) => {
         console.log("err:", err);
-        localStorage.setItem("err", err);
+        setLoginError(true);
       });
   };
 
@@ -56,16 +51,13 @@ const Login = () => {
         <div className="card">
           <div className="d-flex flex-column card-body">
             <h1 className="text-center">Login</h1>
-            <form
-              onSubmit={(event) => onSubmit(event)}
-              className="d-grid gap-3"
-            >
+            <form className="d-grid gap-3">
               <input
                 name="email"
                 type="email"
                 placeholder="email"
                 className="form-control"
-                onChange={onChange}
+                onChange={handleChange}
                 value={input.email}
               />
               <input
@@ -73,15 +65,19 @@ const Login = () => {
                 type="password"
                 placeholder="password"
                 className="form-control"
-                onChange={onChange}
+                onChange={handleChange}
                 value={input.password}
               />
-              {localStorage.loginError ? (
+              {loginError ? (
                 <span className="text-danger">wrong email or password</span>
               ) : (
                 <></>
               )}
-              <button type="submit" className="btn btn-primary">
+              <button
+                onClick={handleSubmit}
+                type="button"
+                className="btn btn-primary"
+              >
                 Login
               </button>
             </form>
