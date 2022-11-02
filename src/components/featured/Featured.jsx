@@ -1,43 +1,47 @@
+import { useState, useEffect } from "react";
 import "./featured.css";
 
-const Featured = () => {
+import { serverPath } from "../../utils/path";
+
+const renderFeaturedItem = (item) => {
   return (
-    <div className="featured">
-      <div className="featuredItem">
-        <img
-          src="https://cf.bstatic.com/xdata/images/city/max500/957801.webp?k=a969e39bcd40cdcc21786ba92826063e3cb09bf307bcfeac2aa392b838e9b7a5&o="
-          alt=""
-          className="featuredImg"
-        />
-        <div className="featuredTitles">
-          <h1>Dublin</h1>
-          <h2>123 properties</h2>
-        </div>
-      </div>
-      
-      <div className="featuredItem">
-        <img
-          src="https://cf.bstatic.com/xdata/images/city/max500/690334.webp?k=b99df435f06a15a1568ddd5f55d239507c0156985577681ab91274f917af6dbb&o="
-          alt=""
-          className="featuredImg"
-        />
-        <div className="featuredTitles">
-          <h1>Reno</h1>
-          <h2>533 properties</h2>
-        </div>
-      </div>
-      <div className="featuredItem">
-        <img
-          src="https://cf.bstatic.com/xdata/images/city/max500/689422.webp?k=2595c93e7e067b9ba95f90713f80ba6e5fa88a66e6e55600bd27a5128808fdf2&o="
-          alt=""
-          className="featuredImg"
-        />
-        <div className="featuredTitles">
-          <h1>Austin</h1>
-          <h2>532 properties</h2>
-        </div>
+    <div key={item.cityName} className="featuredItem">
+      <img src={item.imageUrl} alt="" className="featuredImg" />
+      <div className="featuredTitles">
+        <h1>{item.cityName}</h1>
+        <h2>{item.quantity} properties</h2>
       </div>
     </div>
+  );
+};
+
+const renderFeaturedList = (list) => {
+  if (list.length > 0) {
+    return (
+      <div className="featured">
+        {list.map((item) => renderFeaturedItem(item))}
+      </div>
+    );
+  } else {
+    <h1>No hotel found</h1>;
+  }
+};
+
+const Featured = () => {
+  const [hotelByCity, setHotelByCity] = useState([]);
+
+  useEffect(() => {
+    fetch(serverPath + "/get-hotels-by-area")
+      .then((result) => result.json())
+      .then((data) => {
+        // console.log("data.hotelByCity:", data.hotelByCity);
+        setHotelByCity(data.hotelByCity);
+      })
+      .catch((err) => console.log("err:", err));
+  }, []);
+
+  return (
+    <section className="featured">{renderFeaturedList(hotelByCity)}</section>
   );
 };
 

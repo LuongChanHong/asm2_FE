@@ -48,13 +48,13 @@
 }
 
 .headerSearch {
-  height: 30px;
+  height: fit-content;
   background-color: white;
   border: 3px solid #febb02;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 10px 0px;
+  /* padding: 10px 0px; */
   border-radius: 5px;
   position: absolute;
   bottom: -25px;

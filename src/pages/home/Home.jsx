@@ -10,16 +10,13 @@ import Navbar from "../../components/navbar/Navbar";
 import PropertyList from "../../components/propertyList/PropertyList";
 import "./home.css";
 
-import { mainPath } from "../../utils/path";
-
 const Home = () => {
   const navigate = useNavigate();
-  // useEffect(() => {
-  //   if (!localStorage.currentUser) {
-  //     // window.location.href = mainPath + "/login";
-  //     navigate("/login");
-  //   }
-  // });
+  useEffect(() => {
+    if (!localStorage.currentUser) {
+      navigate("/login");
+    }
+  });
   return (
     <div>
       <Navbar />

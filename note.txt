@@ -1,2 +1,2 @@
 Nội dung app:
-- thêm chức năng logout
+- hoàn thành render tất cả nội dung home page
