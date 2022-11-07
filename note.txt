@@ -1,2 +1,2 @@
 Nội dung app:
-- hoàn thành render tất cả nội dung home page
+- test search hotel method

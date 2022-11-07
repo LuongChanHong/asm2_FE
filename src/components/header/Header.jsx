@@ -1,3 +1,5 @@
+import "react-date-range/dist/styles.css"; // main css file
+import "react-date-range/dist/theme/default.css"; // theme css file
 import {
   faBed,
   faCalendarDays,
@@ -7,13 +9,14 @@ import {
   faTaxi,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "./header.css";
 import { DateRange } from "react-date-range";
 import { useState } from "react";
-import "react-date-range/dist/styles.css"; // main css file
-import "react-date-range/dist/theme/default.css"; // theme css file
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+
+import { serverPath } from "../../utils/path";
+
+import "./header.css";
 
 const Header = ({ type }) => {
   const [destination, setDestination] = useState("");
@@ -31,6 +34,8 @@ const Header = ({ type }) => {
     children: 0,
     room: 1,
   });
+  const [errorDate, setErrorDate] = useState(false);
+  const [errorDestination, setErrorDestination] = useState(false);
 
   const navigate = useNavigate();
 
@@ -43,8 +48,77 @@ const Header = ({ type }) => {
     });
   };
 
+  const handleInputOnClick = (inputName) => {
+    switch (inputName) {
+      case "destination":
+        setOpenDate(false);
+        setOpenOptions(false);
+        break;
+      case "date":
+        setOpenDate(!openDate);
+        setOpenOptions(false);
+        setErrorDate(false);
+        break;
+      case "person":
+        setOpenOptions(!openOptions);
+        setOpenDate(false);
+        break;
+    }
+  };
+
+  // check is endDate is after to startDate
+  const dateValidation = (date) => {
+    const start = date[0].startDate;
+    const end = date[0].endDate;
+    // case year compare
+    if (start.getFullYear() > end.getFullYear()) {
+      return true;
+    } else if (start.getFullYear() === end.getFullYear()) {
+      // case month compare
+      if (start.getMonth() > end.getMonth()) {
+        return true;
+      } else if (start.getMonth() === end.getMonth()) {
+        // case day compare
+        if (start.getDate() > end.getDate()) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  };
+
   const handleSearch = () => {
-    navigate("/hotels", { state: { destination, date, options } });
+    setOpenDate(false);
+    setOpenOptions(false);
+    const startDate = { ...date[0] }.startDate;
+    const endDate = { ...date[0] }.endDate;
+    const requestData = { date, options, destination };
+    // convert date object to number then compare
+    if (startDate.getTime() === endDate.getTime()) {
+      setErrorDate(true);
+    } else {
+      fetch(serverPath + "/search-hotels", {
+        method: "POST",
+        body: JSON.stringify(requestData),
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+      })
+        .then((result) => result.json())
+        .then((data) => {
+          console.log("data:", data);
+        })
+        .catch((err) => console.log("err:", err));
+    }
+    // console.log("date:", date);
+    // console.log("destination:", destination);
+    // console.log("options:", options);
+
+    // navigate("/hotels", { state: { destination, date, options } });
   };
 
   return (
@@ -86,44 +160,71 @@ const Header = ({ type }) => {
               more with a free account
             </p>
             <button className="headerBtn">Sign in / Register</button>
+            {/* =========================== */}
+            {/* SEARCH COMPONENT */}
+            {/* =========================== */}
             <div className="headerSearch">
-              <div className="headerSearchItem">
-                <FontAwesomeIcon icon={faBed} className="headerIcon" />
-                <input
-                  type="text"
-                  placeholder="Where are you going?"
-                  className="headerSearchInput"
-                  onChange={(e) => setDestination(e.target.value)}
-                />
-              </div>
-              <div className="headerSearchItem">
-                <FontAwesomeIcon icon={faCalendarDays} className="headerIcon" />
-                <span
-                  onClick={() => setOpenDate(!openDate)}
-                  className="headerSearchText"
-                >{`${format(date[0].startDate, "MM/dd/yyyy")} to ${format(
-                  date[0].endDate,
-                  "MM/dd/yyyy"
-                )}`}</span>
-                {openDate && (
-                  <DateRange
-                    editableDateInputs={true}
-                    onChange={(item) => setDate([item.selection])}
-                    moveRangeOnFirstSelection={false}
-                    ranges={date}
-                    className="date"
-                    minDate={new Date()}
+              {/* destination input*/}
+              <section className="headerSearchWrap">
+                <div className="headerSearchItem">
+                  <FontAwesomeIcon icon={faBed} className="headerIcon" />
+                  <input
+                    type="text"
+                    placeholder="Where are you going?"
+                    className="headerSearchInput"
+                    onChange={(e) => setDestination(e.target.value)}
+                    onClick={() => handleInputOnClick("destination")}
                   />
+                </div>
+                {errorDestination ? (
+                  <span className="searchWanring">location error</span>
+                ) : (
+                  <></>
                 )}
-              </div>
+              </section>
+              {/* date input*/}
+              <section className="headerSearchWrap">
+                <div className="headerSearchItem">
+                  <FontAwesomeIcon
+                    icon={faCalendarDays}
+                    className="headerIcon"
+                  />
+                  <span
+                    onClick={() => handleInputOnClick("date")}
+                    className="headerSearchText"
+                  >{`${format(date[0].startDate, "MM/dd/yyyy")} to ${format(
+                    date[0].endDate,
+                    "MM/dd/yyyy"
+                  )}`}</span>
+                  {openDate && (
+                    <DateRange
+                      editableDateInputs={true}
+                      onChange={(item) => setDate([item.selection])}
+                      moveRangeOnFirstSelection={false}
+                      ranges={date}
+                      className="date"
+                      minDate={new Date()}
+                    />
+                  )}
+                </div>
+                {errorDate ? (
+                  <span className="searchWanring">date error</span>
+                ) : (
+                  <></>
+                )}
+              </section>
+
+              {/* person input */}
               <div className="headerSearchItem">
                 <FontAwesomeIcon icon={faPerson} className="headerIcon" />
                 <span
-                  onClick={() => setOpenOptions(!openOptions)}
+                  onClick={() => handleInputOnClick("person")}
                   className="headerSearchText"
                 >{`${options.adult} adult · ${options.children} children · ${options.room} room`}</span>
                 {openOptions && (
+                  // option list
                   <div className="options">
+                    {/* option item */}
                     <div className="optionItem">
                       <span className="optionText">Adult</span>
                       <div className="optionCounter">
@@ -145,6 +246,8 @@ const Header = ({ type }) => {
                         </button>
                       </div>
                     </div>
+                    {/* option item */}
+                    {/* option item */}
                     <div className="optionItem">
                       <span className="optionText">Children</span>
                       <div className="optionCounter">
@@ -166,6 +269,8 @@ const Header = ({ type }) => {
                         </button>
                       </div>
                     </div>
+                    {/* option item */}
+                    {/* option item */}
                     <div className="optionItem">
                       <span className="optionText">Room</span>
                       <div className="optionCounter">
@@ -187,9 +292,11 @@ const Header = ({ type }) => {
                         </button>
                       </div>
                     </div>
+                    {/* option item */}
                   </div>
                 )}
               </div>
+              {/* search button */}
               <div className="headerSearchItem">
                 <button className="headerBtn" onClick={handleSearch}>
                   Search

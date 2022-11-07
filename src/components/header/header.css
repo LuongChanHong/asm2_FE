@@ -66,6 +66,21 @@
   color: lightgray;
 }
 
+.headerSearchWrap {
+  position: relative;
+}
+
+.searchWanring {
+  position: absolute;
+  color: red;
+  font-weight: bold;
+  border: 1px solid red;
+  border-radius: 5px;
+  background-color: white;
+  left: 20%;
+  padding: 2px 2rem;
+}
+
 .headerSearchItem {
   display: flex;
   align-items: center;
