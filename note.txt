@@ -1,2 +1,2 @@
 Nội dung app:
-- test search hotel method
+- viết các hàm hỗ trợ tìm kiếm hotel
