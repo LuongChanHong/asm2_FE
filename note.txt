@@ -1,2 +1,2 @@
 Nội dung app:
-- viết các hàm hỗ trợ tìm kiếm hotel
+- Tìm được các phòng trống từ transaction theo thời gian user book
