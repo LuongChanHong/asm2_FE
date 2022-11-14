@@ -36,6 +36,7 @@ const Header = ({ type }) => {
   });
   const [errorDate, setErrorDate] = useState(false);
   const [errorDestination, setErrorDestination] = useState(false);
+  const [hotels, setHotels] = useState([]);
 
   const navigate = useNavigate();
 
@@ -66,32 +67,6 @@ const Header = ({ type }) => {
     }
   };
 
-  // check is endDate is after to startDate
-  const dateValidation = (date) => {
-    const start = date[0].startDate;
-    const end = date[0].endDate;
-    // case year compare
-    if (start.getFullYear() > end.getFullYear()) {
-      return true;
-    } else if (start.getFullYear() === end.getFullYear()) {
-      // case month compare
-      if (start.getMonth() > end.getMonth()) {
-        return true;
-      } else if (start.getMonth() === end.getMonth()) {
-        // case day compare
-        if (start.getDate() > end.getDate()) {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  };
-
   const handleSearch = () => {
     setOpenDate(false);
     setOpenOptions(false);
@@ -109,16 +84,26 @@ const Header = ({ type }) => {
         credentials: "same-origin",
       })
         .then((result) => result.json())
-        .then((data) => {
-          console.log("data:", data);
+        .then((hotels) => {
+          // console.log("hotels:", hotels);
+          setHotels(hotels);
+          if (hotels.length > 0) {
+            // redirect to found hotel list page
+            // and send found hotels list
+            const searchedData = {
+              destination: destination,
+              date: date,
+              options: options,
+              hotels: hotels,
+            };
+            navigate(`/hotels`, { state: searchedData });
+          }
         })
         .catch((err) => console.log("err:", err));
     }
     // console.log("date:", date);
     // console.log("destination:", destination);
     // console.log("options:", options);
-
-    // navigate("/hotels", { state: { destination, date, options } });
   };
 
   return (

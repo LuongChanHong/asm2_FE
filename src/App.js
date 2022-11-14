@@ -15,10 +15,8 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route exact path="/login" element={<Login />} />
         <Route exact path="/signup" element={<Signup />} />
-
-        {/* <Route path="/" element={<Home/>}/> */}
-        {/* <Route path="/hotels" element={<List/>}/>
-        <Route path="/hotels/:id" element={<Hotel/>}/> */}
+        <Route exact path="/hotels" element={<List />} />
+        <Route exact path="/hotel/:id" element={<Hotel />} />
         <Route exact path="/home" element={<Home />} />
       </Routes>
     </BrowserRouter>

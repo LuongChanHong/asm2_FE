@@ -2,19 +2,38 @@ import "./list.css";
 import Navbar from "../../components/navbar/Navbar";
 import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
+import MailList from "../../components/mailList/MailList";
+import SearchItem from "../../components/searchItem/SearchItem";
 
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { format } from "date-fns";
 import { DateRange } from "react-date-range";
-import SearchItem from "../../components/searchItem/SearchItem";
+
+const renderHotelsList = (list) => {
+  // console.log("list:", list);
+  if (list.length > 0) {
+    return (
+      <div className="listResult">
+        {list.map((item) => (
+          <SearchItem key={item._id} data={item} />
+        ))}
+      </div>
+    );
+  } else {
+    <h1>No hotel found</h1>;
+  }
+};
 
 const List = () => {
   const location = useLocation();
   const [destination, setDestination] = useState(location.state.destination);
   const [date, setDate] = useState(location.state.date);
-  const [openDate, setOpenDate] = useState(false);
   const [options, setOptions] = useState(location.state.options);
+  const [hotels, setHotels] = useState(location.state.hotels);
+  const [openDate, setOpenDate] = useState(false);
+
+  // console.log("location:", location);
 
   return (
     <div>
@@ -88,14 +107,11 @@ const List = () => {
             </div>
             <button>Search</button>
           </div>
-          <div className="listResult">
-            <SearchItem />
-            <SearchItem />
-            <SearchItem />
-          </div>
+          <>{renderHotelsList(hotels)}</>
         </div>
+        <MailList />
+        <Footer />
       </div>
-      <Footer/>
     </div>
   );
 };
