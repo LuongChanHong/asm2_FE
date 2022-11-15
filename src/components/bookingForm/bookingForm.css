@@ -1,0 +1,106 @@
+.finalCheck__wrapper {
+  display: flex;
+  align-items: center;
+  column-gap: 4rem;
+}
+
+.finalCheck__button button {
+  border: none;
+  border-radius: 5px;
+  background-color: #0071c2;
+  color: white;
+  padding: 0.8rem 3rem;
+}
+
+.finalCheck__options {
+  border: 1px solid #cdcdcd;
+  border-radius: 5px;
+  padding: 0.5rem 0.8rem;
+}
+
+.finalCheck__options:focus {
+  outline: none;
+}
+
+.selectRoom__typeList {
+  padding-top: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.selectRoom__typeList--item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  width: 50%;
+}
+
+.selectRoom__typeList--detail {
+  display: flex;
+  flex-direction: column;
+  min-width: 80%;
+}
+
+.selectRoom__typeList--rooms {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 5px;
+}
+.selectRoom__typeList--checkbox {
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+.userInfo {
+  width: 100%;
+}
+
+.userInfo_form {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+}
+
+.userInfo_form--item {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+}
+
+.userInfo_form--item input {
+  border: 1px solid #cdcdcd;
+  border-radius: 5px;
+  padding: 0.5rem 0.8rem;
+}
+
+.userInfo_form--item input:focus {
+  outline: none;
+}
+
+.bookingContainer {
+  width: 100%;
+  max-width: 1024px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+.bookingInfo {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  column-gap: 3rem;
+}
+
+.datePick__wrapper {
+}
+
+.datePick__calendar {
+  position: relative;
+  top: 0;
+  /* left: 0; */
+}

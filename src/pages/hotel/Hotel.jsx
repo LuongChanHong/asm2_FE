@@ -3,6 +3,7 @@ import Navbar from "../../components/navbar/Navbar";
 import Header from "../../components/header/Header";
 import MailList from "../../components/mailList/MailList";
 import Footer from "../../components/footer/Footer";
+import BookingForm from "../../components/bookingForm/BookingForm";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -19,7 +20,8 @@ import { serverPath } from "../../utils/path";
 const Hotel = () => {
   const [slideNumber, setSlideNumber] = useState(0);
   const [hotel, setHotel] = useState({});
-  const [open, setOpen] = useState(false);
+  const [isSliderOpen, setSliderOpen] = useState(false);
+  const [isFormOpen, setFormOpen] = useState(false);
 
   const { id } = useParams();
 
@@ -61,11 +63,11 @@ const Hotel = () => {
     ];
     photos = photos.concat(_photos);
   }
-  console.log("photos:", photos);
+  // console.log("photos:", photos);
 
   const handleOpen = (i) => {
     setSlideNumber(i);
-    setOpen(true);
+    setSliderOpen(true);
   };
 
   const handleMove = (direction) => {
@@ -85,12 +87,12 @@ const Hotel = () => {
       <Navbar />
       <Header type="list" />
       <div className="hotelContainer">
-        {open && (
+        {isSliderOpen && (
           <div className="slider">
             <FontAwesomeIcon
               icon={faCircleXmark}
               className="close"
-              onClick={() => setOpen(false)}
+              onClick={() => setSliderOpen(false)}
             />
             <FontAwesomeIcon
               icon={faCircleArrowLeft}
@@ -109,7 +111,9 @@ const Hotel = () => {
         )}
         <div className="hotelWrapper">
           <button className="bookNow">Reserve or Book Now!</button>
-          <h1 className="hotelTitle">{hotel.name}</h1>
+          <h1 className="hotelTitle">
+            <strong>{hotel.name}</strong>
+          </h1>
           <div className="hotelAddress">
             <FontAwesomeIcon icon={faLocationDot} />
             <span>{hotel.address}</span>
@@ -135,7 +139,9 @@ const Hotel = () => {
           </div>
           <div className="hotelDetails">
             <div className="hotelDetailsTexts">
-              <h1 className="hotelTitle">{hotel.title}</h1>
+              <h1 className="hotelTitle">
+                <strong>{hotel.title}</strong>
+              </h1>
               <p className="hotelDesc">{hotel.desc}</p>
             </div>
             <div className="hotelDetailsPrice">
@@ -147,10 +153,13 @@ const Hotel = () => {
               <h2>
                 <b>${hotel.cheapestPrice}</b> (1 nights)
               </h2>
-              <button>Reserve or Book Now!</button>
+              <button onClick={() => setFormOpen(!isFormOpen)}>
+                Reserve or Book Now!
+              </button>
             </div>
           </div>
         </div>
+        {isFormOpen ? <BookingForm /> : <></>}
         <MailList />
         <Footer />
       </div>

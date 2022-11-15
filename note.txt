@@ -1,2 +1,2 @@
 Nội dung app:
-- Hiển thị thông tin chi tiết khách sạn
+- Dựng xong form đặt phòng
