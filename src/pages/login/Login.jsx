@@ -35,7 +35,10 @@ const Login = () => {
       .then((data) => {
         // console.log("data:", data);
         // set user để navbar hiện user hiện tại
-        localStorage.setItem("currentUser", JSON.stringify(input));
+        localStorage.setItem(
+          "currentUser",
+          JSON.stringify({ email: input.email })
+        );
         setLoginError(false);
         navigate("/home");
       })

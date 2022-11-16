@@ -29,7 +29,7 @@ const Hotel = () => {
     fetch(serverPath + `/get-hotel-by-id/${id}`)
       .then((result) => result.json())
       .then((hotel) => {
-        console.log("hotel:", hotel);
+        // console.log("hotel:", hotel);
         setHotel(hotel);
       })
       .catch((err) => console.log("err:", err));
@@ -159,7 +159,7 @@ const Hotel = () => {
             </div>
           </div>
         </div>
-        {isFormOpen ? <BookingForm /> : <></>}
+        {isFormOpen ? <BookingForm hotel={hotel} /> : <></>}
         <MailList />
         <Footer />
       </div>

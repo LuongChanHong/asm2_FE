@@ -1,2 +1,2 @@
 Nội dung app:
-- Dựng xong form đặt phòng
+- lọc được phòng trống khi chọn ngày đặt phòng
