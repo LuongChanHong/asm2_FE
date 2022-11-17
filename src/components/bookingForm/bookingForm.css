@@ -96,14 +96,53 @@
   row-gap: 0.5rem;
 }
 
-.userInfo_form--item input {
+.userInfo_form--input {
+  position: relative;
   border: 1px solid #cdcdcd;
   border-radius: 5px;
   padding: 0.5rem 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.userInfo_form--item input:focus {
+/* .userInfo_form--input:hover {
+  background-color: seagreen;
+} */
+
+.userInfo_form--input input {
+  /* background-color: seagreen; */
+  border-radius: 5px;
+  border: none;
+  width: 93%;
+}
+
+.userInfo_form--input input:focus {
   outline: none;
+}
+
+.userInfo_form--input button {
+  position: absolute;
+  right: 0.8rem;
+  background-color: #ebf3ff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  height: 25px;
+  width: 25px;
+  opacity: 0;
+}
+
+.userInfo_form--input button:hover {
+  opacity: 1;
+}
+
+.userInfo_form--input svg {
+  width: 12px;
+  height: 12px;
+  color: #0071c2;
 }
 
 .bookingContainer {

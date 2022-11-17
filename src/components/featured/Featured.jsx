@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./featured.css";
 
-import { serverPath } from "../../utils/path";
+import { get } from "../../utils/fetch";
 
 const renderFeaturedItem = (item) => {
   return (
@@ -31,7 +31,7 @@ const Featured = () => {
   const [hotelByCity, setHotelByCity] = useState([]);
 
   useEffect(() => {
-    fetch(serverPath + "/get-hotels-by-area")
+    get("/get-hotels-by-area")
       .then((result) => result.json())
       .then((data) => {
         // console.log("data.hotelByCity:", data.hotelByCity);

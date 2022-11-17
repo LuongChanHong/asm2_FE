@@ -2,7 +2,8 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { serverPath } from "../../utils/path";
+import { post } from "../../utils/fetch";
+
 import Navbar from "../../components/navbar/Navbar";
 
 const Signup = () => {
@@ -23,12 +24,7 @@ const Signup = () => {
   const handleSubmit = (event) => {
     // event.preventDefault();
     // console.log("input:", input);
-    fetch(serverPath + "/signup", {
-      method: "POST",
-      body: JSON.stringify(input),
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-    })
+    post("/signup", input)
       .then((response) => response.json())
       .then((data) => {
         // console.log("data:", data);

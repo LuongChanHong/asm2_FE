@@ -15,7 +15,7 @@ import {
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { serverPath } from "../../utils/path";
+import { get } from "../../utils/fetch";
 
 const Hotel = () => {
   const [slideNumber, setSlideNumber] = useState(0);
@@ -26,7 +26,7 @@ const Hotel = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    fetch(serverPath + `/get-hotel-by-id/${id}`)
+    get(`/get-hotel-by-id/`, id)
       .then((result) => result.json())
       .then((hotel) => {
         // console.log("hotel:", hotel);

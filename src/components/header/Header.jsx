@@ -14,7 +14,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
-import { serverPath } from "../../utils/path";
+import { post } from "../../utils/fetch";
 
 import "./header.css";
 
@@ -77,12 +77,7 @@ const Header = ({ type }) => {
     if (startDate.getTime() === endDate.getTime()) {
       setErrorDate(true);
     } else {
-      fetch(serverPath + "/search-hotels", {
-        method: "POST",
-        body: JSON.stringify(requestData),
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-      })
+      post("/search-hotels", requestData)
         .then((result) => result.json())
         .then((hotels) => {
           // console.log("hotels:", hotels);

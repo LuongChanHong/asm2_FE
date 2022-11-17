@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import "./propertyList.css";
 
-import { serverPath } from "../../utils/path";
+import { get } from "../../utils/fetch";
+
 const renderPropertytem = (item) => {
   return (
     <div key={item.type} className="pListItem">
@@ -30,7 +31,7 @@ const PropertyList = () => {
   const [property, setProperty] = useState([]);
 
   useEffect(() => {
-    fetch(serverPath + "/get-hotels-by-area")
+    get("/get-hotels-by-area")
       .then((result) => result.json())
       .then((data) => {
         // console.log("data.propertyByType:", data.propertyByType);

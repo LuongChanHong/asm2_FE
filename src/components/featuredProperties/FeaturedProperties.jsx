@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import "./featuredProperties.css";
 
-import { serverPath } from "../../utils/path";
+import { get } from "../../utils/fetch";
 
 const renderPropertiItem = (item) => {
   return (
@@ -37,7 +37,7 @@ const FeaturedProperties = () => {
   const [ratingHotels, setRatingHotels] = useState([]);
 
   useEffect(() => {
-    fetch(serverPath + "/get-hotels-by-area")
+    get("/get-hotels-by-area")
       .then((result) => result.json())
       .then((data) => {
         // console.log("data:", data);

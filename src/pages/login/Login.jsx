@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "./login.css";
-import { serverPath } from "../../utils/path";
+import { post } from "../../utils/fetch";
 
 import Navbar from "../../components/navbar/Navbar";
 
 const Login = () => {
-  const [input, setInput] = useState({ email: "", password: "" });
+  const [input, setInput] = useState({
+    email: "user1@mail.com",
+    password: "456",
+  });
   // const [user, setUser] = useState({});
   const [loginError, setLoginError] = useState(false);
 
@@ -25,14 +28,9 @@ const Login = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // console.log("input:", input);
-    fetch(serverPath + "/login", {
-      method: "POST",
-      body: JSON.stringify(input),
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-    })
+    post("/login", input)
       .then((response) => response.json())
-      .then((data) => {
+      .then(() => {
         // console.log("data:", data);
         // set user để navbar hiện user hiện tại
         localStorage.setItem(
