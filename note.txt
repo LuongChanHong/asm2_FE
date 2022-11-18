@@ -1,2 +1,2 @@
 Nội dung app:
-- tụ động nhập thông tin người dùng vào form khi đặt phòng
+- kiểm tra lỗi khi người dùng điền form đặt phòng

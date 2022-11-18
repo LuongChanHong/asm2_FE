@@ -12,6 +12,9 @@ import { post } from "../../utils/fetch";
 
 import "./bookingForm.css";
 
+const PHONE_DIGIT = 10;
+const IDENTITY_DIGIT = 12;
+
 const renderRoomItem = (room, index) => {
   return (
     <div key={index} className="selectRoom__typeList--item">
@@ -51,6 +54,42 @@ const renderAvailableRooms = (roomList) => {
   );
 };
 
+// Validation is any number in string
+const textValidation = (text) => {
+  // const regular = /^[a-zA-Z]*$/;
+  // const space = /^\s+$/;
+  let flag = true;
+  const charList = text.split("");
+  charList.forEach((char) => {
+    const parsedChar = parseInt(char);
+    if (parsedChar == char) {
+      flag = false;
+    }
+  });
+  return flag;
+};
+
+// Validation is value is number
+const numberValidation = (number, digitNumbers) => {
+  const regular = /^[0-9]+$/;
+  if (regular.test(number) && number.length === digitNumbers) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+//
+const emailValidation = (email) => {
+  const regular =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if (regular.test(email)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 const BookingForm = (props) => {
   const [date, setDate] = useState([
     {
@@ -60,15 +99,19 @@ const BookingForm = (props) => {
     },
   ]);
   const [emptyRooms, setEmptyRooms] = useState([]);
-  const [inputValida, setInputValida] = useState({
+  const [inputValid, setInputValid] = useState({
+    fullName: true,
+    email: true,
+    phoneNumber: true,
+    identity: true,
+  });
+  const [isInputClick, setInputClick] = useState({
     fullName: true,
     email: true,
     phoneNumber: true,
     identity: true,
   });
   const [userInfo, setUserInfo] = useState({});
-
-  const validationFlag = true;
 
   useEffect(() => {
     const userEmail = JSON.parse(localStorage.currentUser);
@@ -103,28 +146,51 @@ const BookingForm = (props) => {
     return { name: event.target.name, value: event.target.value };
   };
 
-  const nameValidation = (nameString, inputName) => {
-    const charList = nameString.split("");
-    charList.forEach((char) => {
-      const parsedChar = parseInt(char);
-
-      if (parsedChar == char) {
-        // DÙNG validationFlag Ở ĐÂY KHI CHAR LÀ SỐ
-        console.log("==========================");
-        console.log("RUN");
-        console.log("inputValida[inputName]:", inputValida[inputName]);
-        setInputValida({ ...inputValida, [inputName]: false });
-        console.log("inputValida[inputName]:", inputValida[inputName]);
-      }
-    });
-    // SET LẠI STATE NGOÀI VÒNG LẶP CHỖ NÀY
-  };
-
   const handleInputChange = (event) => {
     const target = handleEvent(event);
     setUserInfo({ ...userInfo, [target.name]: target.value });
-    nameValidation(userInfo.fullName);
-    console.log("inputValida:", inputValida.fullName);
+  };
+
+  const handleClick = (event) => {
+    const { name } = handleEvent(event);
+    let isValid = {
+      fullName: true,
+      email: true,
+      phoneNumber: true,
+      identity: true,
+    };
+    switch (name) {
+      case "fullName":
+        isValid.email = emailValidation(userInfo.email);
+        isValid.phoneNumber = numberValidation(
+          userInfo.phoneNumber,
+          PHONE_DIGIT
+        );
+        isValid.identity = numberValidation(userInfo.identity, IDENTITY_DIGIT);
+        break;
+      case "email":
+        isValid.fullName = textValidation(userInfo.fullName);
+        isValid.phoneNumber = numberValidation(
+          userInfo.phoneNumber,
+          PHONE_DIGIT
+        );
+        isValid.identity = numberValidation(userInfo.identity, IDENTITY_DIGIT);
+        break;
+      case "phoneNumber":
+        isValid.email = emailValidation(userInfo.email);
+        isValid.fullName = textValidation(userInfo.fullName);
+        isValid.identity = numberValidation(userInfo.identity, IDENTITY_DIGIT);
+        break;
+      case "identity":
+        isValid.email = emailValidation(userInfo.email);
+        isValid.fullName = textValidation(userInfo.fullName);
+        isValid.phoneNumber = numberValidation(
+          userInfo.phoneNumber,
+          PHONE_DIGIT
+        );
+        break;
+    }
+    setInputValid(isValid);
   };
 
   const handleClearInput = (inputName, event) => {
@@ -172,6 +238,7 @@ const BookingForm = (props) => {
                   type="text"
                   name="fullName"
                   onChange={handleInputChange}
+                  onClick={handleClick}
                   placeholder="Full Name"
                 />
                 <button
@@ -180,6 +247,13 @@ const BookingForm = (props) => {
                   <FontAwesomeIcon icon={faX} />
                 </button>
               </div>
+              <article
+                className={`userInfo_form--warning ${
+                  inputValid.fullName ? `hidden` : ``
+                }`}
+              >
+                Name cannot contain number
+              </article>
             </form>
             {/* form item */}
             {/* form item */}
@@ -188,15 +262,23 @@ const BookingForm = (props) => {
               <div className="userInfo_form--input">
                 <input
                   value={userInfo.email}
-                  type={"email"}
+                  type="email"
                   name="email"
                   onChange={handleInputChange}
+                  onClick={handleClick}
                   placeholder="Email"
                 />
                 <button onClick={(event) => handleClearInput("email", event)}>
                   <FontAwesomeIcon icon={faX} />
                 </button>
               </div>
+              <article
+                className={`userInfo_form--warning ${
+                  inputValid.email ? `hidden` : ``
+                }`}
+              >
+                error text
+              </article>
             </form>
             {/* form item */}
             {/* form item */}
@@ -205,9 +287,10 @@ const BookingForm = (props) => {
               <div className="userInfo_form--input">
                 <input
                   value={userInfo.phoneNumber}
-                  type="text"
+                  type="tel"
                   name="phoneNumber"
                   onChange={handleInputChange}
+                  onClick={handleClick}
                   placeholder="Phone Number"
                 />
                 <button
@@ -216,6 +299,13 @@ const BookingForm = (props) => {
                   <FontAwesomeIcon icon={faX} />
                 </button>
               </div>
+              <article
+                className={`userInfo_form--warning ${
+                  inputValid.phoneNumber ? `hidden` : ``
+                }`}
+              >
+                error text
+              </article>
             </form>
             {/* form item */}
             {/* form item */}
@@ -227,6 +317,7 @@ const BookingForm = (props) => {
                   type="text"
                   name="identity"
                   onChange={handleInputChange}
+                  onClick={handleClick}
                   placeholder="Card Number"
                 />
                 <button
@@ -235,6 +326,13 @@ const BookingForm = (props) => {
                   <FontAwesomeIcon icon={faX} />
                 </button>
               </div>
+              <article
+                className={`userInfo_form--warning ${
+                  inputValid.identity ? `hidden` : ``
+                }`}
+              >
+                error text
+              </article>
             </form>
             {/* form item */}
           </div>

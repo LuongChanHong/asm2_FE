@@ -1,3 +1,7 @@
+.hidden {
+  opacity: 0;
+}
+
 .finalCheck__wrapper {
   display: flex;
   align-items: center;
@@ -87,13 +91,18 @@
 .userInfo_form {
   display: flex;
   flex-direction: column;
-  row-gap: 1rem;
+  /* row-gap: 1rem; */
 }
 
 .userInfo_form--item {
   display: flex;
   flex-direction: column;
-  row-gap: 0.5rem;
+  /* row-gap: 0.5rem; */
+}
+
+.userInfo_form--warning {
+  padding-left: 0.5rem;
+  color: red;
 }
 
 .userInfo_form--input {
@@ -114,7 +123,7 @@
   /* background-color: seagreen; */
   border-radius: 5px;
   border: none;
-  width: 93%;
+  width: 95%;
 }
 
 .userInfo_form--input input:focus {
