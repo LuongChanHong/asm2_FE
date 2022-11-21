@@ -1,2 +1,2 @@
 Nội dung app:
-- kiểm tra lỗi khi người dùng điền form đặt phòng
+- nâng cấp kiểm tra lỗi khi người dùng điền form đặt phòng

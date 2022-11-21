@@ -15,81 +15,6 @@ import "./bookingForm.css";
 const PHONE_DIGIT = 10;
 const IDENTITY_DIGIT = 12;
 
-const renderRoomItem = (room, index) => {
-  return (
-    <div key={index} className="selectRoom__typeList--item">
-      <div className="selectRoom__typeList--wrapper">
-        <section className="selectRoom__typeList--detail">
-          <h6>
-            <b>{room.title}</b>
-          </h6>
-          <span className="selectRoom__typeList--desc">{room.desc}</span>
-          <div className="selectRoom__typeList--bottom">
-            <span>
-              <b> Max people: {room.maxPeople}</b>
-            </span>
-            <b>${room.price}</b>
-          </div>
-        </section>
-        {/* Room checkboxs */}
-        <section className="selectRoom__typeList--rooms">
-          {room.rooms.map((number, index) => (
-            <form key={index} className="selectRoom__typeList--checkbox">
-              <label htmlFor="">{number}</label>
-              <input type="checkbox" />
-            </form>
-          ))}
-        </section>
-        {/* Room checkboxs */}
-      </div>
-    </div>
-  );
-};
-
-const renderAvailableRooms = (roomList) => {
-  return (
-    <div className="selectRoom__typeList">
-      {roomList.map((room, index) => renderRoomItem(room, index))}
-    </div>
-  );
-};
-
-// Validation is any number in string
-const textValidation = (text) => {
-  // const regular = /^[a-zA-Z]*$/;
-  // const space = /^\s+$/;
-  let flag = true;
-  const charList = text.split("");
-  charList.forEach((char) => {
-    const parsedChar = parseInt(char);
-    if (parsedChar == char) {
-      flag = false;
-    }
-  });
-  return flag;
-};
-
-// Validation is value is number
-const numberValidation = (number, digitNumbers) => {
-  const regular = /^[0-9]+$/;
-  if (regular.test(number) && number.length === digitNumbers) {
-    return true;
-  } else {
-    return false;
-  }
-};
-
-//
-const emailValidation = (email) => {
-  const regular =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (regular.test(email)) {
-    return true;
-  } else {
-    return false;
-  }
-};
-
 const BookingForm = (props) => {
   const [date, setDate] = useState([
     {
@@ -105,13 +30,10 @@ const BookingForm = (props) => {
     phoneNumber: true,
     identity: true,
   });
-  const [isInputClick, setInputClick] = useState({
-    fullName: true,
-    email: true,
-    phoneNumber: true,
-    identity: true,
-  });
+  const [bookedRooms, setBookedRooms] = useState([]);
   const [userInfo, setUserInfo] = useState({});
+  const [payMethod, setPayMethod] = useState("");
+  let [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     const userEmail = JSON.parse(localStorage.currentUser);
@@ -143,15 +65,136 @@ const BookingForm = (props) => {
 
   const handleEvent = (event) => {
     // console.log("event:", event.target.value);
-    return { name: event.target.name, value: event.target.value };
+    return {
+      name: event.target.name,
+      value: event.target.value,
+      checked: event.target.checked,
+    };
+  };
+
+  const calTotalPrice = (price, isBookingMore) => {
+    const { startDate, endDate } = date[0];
+    const bookingDays = endDate.getUTCDate() - startDate.getUTCDate() + 1;
+    if (isBookingMore) {
+      totalPrice += price * bookingDays;
+    } else {
+      totalPrice -= price * bookingDays;
+    }
+    setTotalPrice(totalPrice);
+  };
+
+  // Add picking room to list and calculate total bill
+  const handleRoomPicking = (event, id, price) => {
+    const { name, checked } = handleEvent(event);
+    const _bookedRooms = [...bookedRooms];
+
+    if (checked) {
+      _bookedRooms.push({ roomId: id, roomNumber: name });
+      calTotalPrice(price, checked);
+    } else {
+      _bookedRooms.forEach((room, index) => {
+        if (room.roomId === id && room.roomNumber === name) {
+          _bookedRooms.splice(index, 1);
+          calTotalPrice(price, checked);
+        }
+      });
+    }
+    setBookedRooms(_bookedRooms);
+  };
+
+  const renderRoomItem = (room, index) => {
+    return (
+      <div key={index} className="selectRoom__typeList--item">
+        <div className="selectRoom__typeList--wrapper">
+          <section className="selectRoom__typeList--detail">
+            <h6>
+              <b>{room.title}</b>
+            </h6>
+            <span className="selectRoom__typeList--desc">{room.desc}</span>
+            <div className="selectRoom__typeList--bottom">
+              <span>
+                <b> Max people: {room.maxPeople}</b>
+              </span>
+              <b>${room.price}</b>
+            </div>
+          </section>
+          {/* Room checkboxs */}
+          <section className="selectRoom__typeList--rooms">
+            {room.rooms.map((number, i) => (
+              <form key={i} className="selectRoom__typeList--checkbox">
+                <label htmlFor="">{number}</label>
+                <input
+                  name={number}
+                  type="checkbox"
+                  onChange={(event) =>
+                    handleRoomPicking(event, room.roomId, room.price)
+                  }
+                />
+              </form>
+            ))}
+          </section>
+          {/* Room checkboxs */}
+        </div>
+      </div>
+    );
+  };
+
+  const renderAvailableRooms = (roomList) => {
+    return (
+      <div className="selectRoom__typeList">
+        {roomList.map((room, index) => renderRoomItem(room, index))}
+      </div>
+    );
+  };
+
+  // Validation is any number in string
+  const textValidation = (text) => {
+    // const regular = /^[a-zA-Z]*$/;
+    // const space = /^\s+$/;
+    let flag = true;
+    const charList = text.split("");
+    charList.forEach((char) => {
+      const parsedChar = parseInt(char);
+      if (parsedChar == char) {
+        flag = false;
+      }
+    });
+    return flag;
+  };
+
+  // Validation is value is number
+  const numberValidation = (number, digitNumbers) => {
+    const regular = /^[0-9]+$/;
+    if (regular.test(number) && number.length === digitNumbers) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  //
+  const emailValidation = (email) => {
+    const regular =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (regular.test(email)) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   const handleInputChange = (event) => {
     const target = handleEvent(event);
     setUserInfo({ ...userInfo, [target.name]: target.value });
   };
+  const handlePayMethod = (event) => {
+    const { value } = handleEvent(event);
+    if (value === "Credit Card" || value === "Cash") {
+      setPayMethod(value);
+    }
+  };
 
-  const handleClick = (event) => {
+  const handleInputValid = (event) => {
     const { name } = handleEvent(event);
     let isValid = {
       fullName: true,
@@ -198,6 +241,53 @@ const BookingForm = (props) => {
     setUserInfo({ ...userInfo, [inputName]: "" });
   };
 
+  const reserveFinalCheck = () => {
+    // console.log("run");
+    const { startDate, endDate } = date[0];
+    if (startDate.getDate() === endDate.getDate()) {
+      return false;
+    }
+    const { fullName, email, identity, phoneNumber } = userInfo;
+    const _inputValid = { ...inputValid };
+
+    _inputValid.fullName = textValidation(fullName) ? true : false;
+    _inputValid.email = emailValidation(email) ? true : false;
+    _inputValid.identity = numberValidation(identity, IDENTITY_DIGIT)
+      ? true
+      : false;
+    _inputValid.phoneNumber = numberValidation(phoneNumber, PHONE_DIGIT)
+      ? true
+      : false;
+    setInputValid(_inputValid);
+    if (
+      _inputValid.fullName === false ||
+      _inputValid.email === false ||
+      _inputValid.identity === false ||
+      _inputValid.phoneNumber === false
+    ) {
+      return false;
+    }
+  };
+
+  const handleReserve = () => {
+    const reserveData = {
+      user: userInfo,
+      hotel: props.hotel._id,
+      rooms: bookedRooms,
+      date: date,
+      price: totalPrice,
+      payment: payMethod,
+    };
+    const value = reserveFinalCheck();
+    console.log(value);
+    // post("/create-transaction", reserveData)
+    //   .then((result) => result.json())
+    //   .then((data) => {
+    //     console.log("data:", data);
+    //   })
+    //   .catch((err) => console.log("err:", err));
+  };
+
   return (
     <section className="bookingContainer">
       {/* INPUT FORM INFO */}
@@ -231,14 +321,26 @@ const BookingForm = (props) => {
           <div className="userInfo_form">
             {/* form item */}
             <form className="userInfo_form--item">
-              <label>Your Full Name:</label>
-              <div className="userInfo_form--input">
+              <>
+                {inputValid.fullName ? (
+                  <label>Your Full Name:</label>
+                ) : (
+                  <article className="text-danger">
+                    Name cannot contain number
+                  </article>
+                )}
+              </>
+              <div
+                className={`userInfo_form--input ${
+                  inputValid.fullName ? `` : `border border-danger`
+                }`}
+              >
                 <input
                   value={userInfo.fullName}
                   type="text"
                   name="fullName"
                   onChange={handleInputChange}
-                  onClick={handleClick}
+                  onClick={handleInputValid}
                   placeholder="Full Name"
                 />
                 <button
@@ -247,50 +349,58 @@ const BookingForm = (props) => {
                   <FontAwesomeIcon icon={faX} />
                 </button>
               </div>
-              <article
-                className={`userInfo_form--warning ${
-                  inputValid.fullName ? `hidden` : ``
-                }`}
-              >
-                Name cannot contain number
-              </article>
             </form>
             {/* form item */}
             {/* form item */}
             <form className="userInfo_form--item">
-              <label>Your Email:</label>
-              <div className="userInfo_form--input">
+              <>
+                {inputValid.email ? (
+                  <label>Your Email:</label>
+                ) : (
+                  <article className="text-danger">Invalid email</article>
+                )}
+              </>
+              <div
+                className={`userInfo_form--input ${
+                  inputValid.email ? `` : `border border-danger`
+                }`}
+              >
                 <input
                   value={userInfo.email}
                   type="email"
                   name="email"
                   onChange={handleInputChange}
-                  onClick={handleClick}
+                  onClick={handleInputValid}
                   placeholder="Email"
                 />
                 <button onClick={(event) => handleClearInput("email", event)}>
                   <FontAwesomeIcon icon={faX} />
                 </button>
               </div>
-              <article
-                className={`userInfo_form--warning ${
-                  inputValid.email ? `hidden` : ``
-                }`}
-              >
-                error text
-              </article>
             </form>
             {/* form item */}
             {/* form item */}
             <form className="userInfo_form--item">
-              <label>Your Phone Number:</label>
-              <div className="userInfo_form--input">
+              <>
+                {inputValid.phoneNumber ? (
+                  <label>Your Phone Number:</label>
+                ) : (
+                  <article className="text-danger">
+                    Phone number must have 10 number digits
+                  </article>
+                )}
+              </>
+              <div
+                className={`userInfo_form--input ${
+                  inputValid.phoneNumber ? `` : `border border-danger`
+                }`}
+              >
                 <input
                   value={userInfo.phoneNumber}
                   type="tel"
                   name="phoneNumber"
                   onChange={handleInputChange}
-                  onClick={handleClick}
+                  onClick={handleInputValid}
                   placeholder="Phone Number"
                 />
                 <button
@@ -299,25 +409,30 @@ const BookingForm = (props) => {
                   <FontAwesomeIcon icon={faX} />
                 </button>
               </div>
-              <article
-                className={`userInfo_form--warning ${
-                  inputValid.phoneNumber ? `hidden` : ``
-                }`}
-              >
-                error text
-              </article>
             </form>
             {/* form item */}
             {/* form item */}
             <form className="userInfo_form--item">
-              <label>Your Identity Card Number:</label>
-              <div className="userInfo_form--input">
+              <>
+                {inputValid.identity ? (
+                  <label>Your Identity Card Number:</label>
+                ) : (
+                  <article className="text-danger">
+                    Identity number must have 12 number digits
+                  </article>
+                )}
+              </>
+              <div
+                className={`userInfo_form--input ${
+                  inputValid.identity ? `` : `border border-danger`
+                }`}
+              >
                 <input
                   value={userInfo.identity}
                   type="text"
                   name="identity"
                   onChange={handleInputChange}
-                  onClick={handleClick}
+                  onClick={handleInputValid}
                   placeholder="Card Number"
                 />
                 <button
@@ -326,13 +441,6 @@ const BookingForm = (props) => {
                   <FontAwesomeIcon icon={faX} />
                 </button>
               </div>
-              <article
-                className={`userInfo_form--warning ${
-                  inputValid.identity ? `hidden` : ``
-                }`}
-              >
-                error text
-              </article>
             </form>
             {/* form item */}
           </div>
@@ -349,131 +457,21 @@ const BookingForm = (props) => {
       {/* PAYMENT AND RESERVATION */}
       <section className="finalCheck">
         <h4 className="bookingInfo__title">
-          <strong>Total Bill: $700</strong>
+          <strong>Total Bill: ${totalPrice}</strong>
         </h4>
         <div className="finalCheck__wrapper">
-          <select className="finalCheck__options">
+          <select onChange={handlePayMethod} className="finalCheck__options">
             <option value="">Select payment method</option>
             <option value="Credit Card">Credit Card</option>
-            <option value="Credit Card">Cash</option>
+            <option value="Cash">Cash</option>
           </select>
           <div className="finalCheck__button">
-            <button>Reserve Now</button>
+            <button onClick={handleReserve}>Reserve Now</button>
           </div>
         </div>
       </section>
     </section>
   );
 };
-
-// {/* Room type list */}
-// <div className="selectRoom__typeList">
-// {/* Room type item */}
-// <div className="selectRoom__typeList--item">
-//   <section className="selectRoom__typeList--detail">
-//     <h6>Double Room</h6>
-//     <span>Pay not thing until September 04,2022</span>
-//     <span>
-//       Max people:{" "}
-//       <span>
-//         <b>2</b>
-//       </span>
-//     </span>
-//     <b>$350</b>
-//   </section>
-//   {/* Room checkboxs */}
-//   <section className="selectRoom__typeList--rooms">
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">101</label>
-//       <input type="checkbox" />
-//     </form>
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">201</label>
-//       <input type="checkbox" />
-//     </form>
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">202</label>
-//       <input type="checkbox" />
-//     </form>
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">203</label>
-//       <input type="checkbox" />
-//     </form>
-//   </section>
-//   {/* Room checkboxs */}
-// </div>
-// {/* Room type item */}
-// {/* Room type item */}
-// <div className="selectRoom__typeList--item">
-//   <section className="selectRoom__typeList--detail">
-//     <h6>Double Room</h6>
-//     <span>Pay not thing until September 04,2022</span>
-//     <span>
-//       Max people:{" "}
-//       <span>
-//         <b>2</b>
-//       </span>
-//     </span>
-//     <b>$350</b>
-//   </section>
-//   {/* Room checkboxs */}
-//   <section className="selectRoom__typeList--rooms">
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">101</label>
-//       <input type="checkbox" />
-//     </form>
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">201</label>
-//       <input type="checkbox" />
-//     </form>
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">202</label>
-//       <input type="checkbox" />
-//     </form>
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">203</label>
-//       <input type="checkbox" />
-//     </form>
-//   </section>
-//   {/* Room checkboxs */}
-// </div>
-// {/* Room type item */}
-// {/* Room type item */}
-// <div className="selectRoom__typeList--item">
-//   <section className="selectRoom__typeList--detail">
-//     <h6>Double Room</h6>
-//     <span>Pay not thing until September 04,2022</span>
-//     <span>
-//       Max people:{" "}
-//       <span>
-//         <b>2</b>
-//       </span>
-//     </span>
-//     <b>$350</b>
-//   </section>
-//   {/* Room checkboxs */}
-//   <section className="selectRoom__typeList--rooms">
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">101</label>
-//       <input type="checkbox" />
-//     </form>
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">201</label>
-//       <input type="checkbox" />
-//     </form>
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">202</label>
-//       <input type="checkbox" />
-//     </form>
-//     <form className="selectRoom__typeList--checkbox">
-//       <label htmlFor="">203</label>
-//       <input type="checkbox" />
-//     </form>
-//   </section>
-//   {/* Room checkboxs */}
-// </div>
-// {/* Room type item */}
-// </div>
-// {/* Room type list */}
 
 export default BookingForm;

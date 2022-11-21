@@ -91,7 +91,7 @@
 .userInfo_form {
   display: flex;
   flex-direction: column;
-  /* row-gap: 1rem; */
+  row-gap: 1.5rem;
 }
 
 .userInfo_form--item {
@@ -102,7 +102,6 @@
 
 .userInfo_form--warning {
   padding-left: 0.5rem;
-  color: red;
 }
 
 .userInfo_form--input {
