@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useState, useEffect } from "react";
 import { DateRange } from "react-date-range";
-import { format } from "date-fns";
+import { format, getDate } from "date-fns";
 
 import { post } from "../../utils/fetch";
 
@@ -24,14 +24,16 @@ const BookingForm = (props) => {
     },
   ]);
   const [emptyRooms, setEmptyRooms] = useState([]);
-  const [inputValid, setInputValid] = useState({
+  const [bookedRooms, setBookedRooms] = useState([]);
+  const [userInfo, setUserInfo] = useState({});
+  const [isInputValid, setInputValid] = useState({
     fullName: true,
     email: true,
     phoneNumber: true,
     identity: true,
   });
-  const [bookedRooms, setBookedRooms] = useState([]);
-  const [userInfo, setUserInfo] = useState({});
+  const [isDateValid, setDateValid] = useState(true);
+  const [isRenderError, setRenderError] = useState(false);
   const [payMethod, setPayMethod] = useState("");
   let [totalPrice, setTotalPrice] = useState(0);
 
@@ -54,7 +56,7 @@ const BookingForm = (props) => {
       post("/get-rooms-by-date", { date: date, hotel: props.hotel })
         .then((result) => result.json())
         .then((rooms) => {
-          console.log("rooms:", rooms);
+          // console.log("rooms:", rooms);
           setEmptyRooms(rooms);
         })
         .catch((err) => {
@@ -102,6 +104,9 @@ const BookingForm = (props) => {
     setBookedRooms(_bookedRooms);
   };
 
+  // --------------------------------------
+  // RENDER FUNCTION
+  // --------------------------------------
   const renderRoomItem = (room, index) => {
     return (
       <div key={index} className="selectRoom__typeList--item">
@@ -147,129 +152,208 @@ const BookingForm = (props) => {
     );
   };
 
-  // Validation is any number in string
-  const textValidation = (text) => {
+  const renderAllInputError = () => {
+    let isAllInputValid =
+      isInputValid.fullName &&
+      isInputValid.email &&
+      isInputValid.identity &&
+      isInputValid.phoneNumber;
+    return isRenderError ? (
+      <section
+        className={`finalCheck__error errorBorder ${
+          isDateValid &&
+          isAllInputValid &&
+          payMethod !== "" &&
+          bookedRooms.length !== 0
+            ? `hidden`
+            : ``
+        }`}
+      >
+        {isDateValid ? <></> : <p className="errorText">Invalid date</p>}
+        {isAllInputValid ? (
+          <></>
+        ) : (
+          <p className="errorText">Invalid info form detail</p>
+        )}
+        {payMethod === "" ? (
+          <p className="errorText">Please choose a payment method</p>
+        ) : (
+          <></>
+        )}
+        {bookedRooms.length === 0 ? (
+          <p className="errorText">Please select a room</p>
+        ) : (
+          <></>
+        )}
+      </section>
+    ) : (
+      <></>
+    );
+  };
+  // --------------------------------------
+  // RENDER FUNCTION
+  // --------------------------------------
+
+  // --------------------------------------
+  // VALIDATION FUNCTION
+  // --------------------------------------
+  const textValidation = (text, name) => {
     // const regular = /^[a-zA-Z]*$/;
     // const space = /^\s+$/;
-    let flag = true;
-    const charList = text.split("");
-    charList.forEach((char) => {
-      const parsedChar = parseInt(char);
-      if (parsedChar == char) {
-        flag = false;
-      }
-    });
-    return flag;
-  };
-
-  // Validation is value is number
-  const numberValidation = (number, digitNumbers) => {
-    const regular = /^[0-9]+$/;
-    if (regular.test(number) && number.length === digitNumbers) {
-      return true;
+    let isValid = true;
+    if (text === "") {
+      isValid = false;
     } else {
-      return false;
+      const charList = text.split("");
+      charList.forEach((char) => {
+        const parsedChar = parseInt(char);
+        if (parsedChar == char) {
+          isValid = false;
+        }
+      });
     }
+    setInputValid({ ...isInputValid, [name]: isValid });
+    return isValid;
   };
 
-  //
-  const emailValidation = (email) => {
-    const regular =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if (regular.test(email)) {
-      return true;
+  const numberValidation = (number, name, digitNumbers) => {
+    let isValid;
+    if (number != "") {
+      const regular = /^[0-9]+$/;
+      if (regular.test(number) && number.length === digitNumbers) {
+        isValid = true;
+      } else {
+        isValid = false;
+      }
     } else {
-      return false;
+      isValid = false;
+    }
+    setInputValid({ ...isInputValid, [name]: isValid });
+    return isValid;
+  };
+
+  const emailValidation = (email, name) => {
+    let isValid;
+    if (email != "") {
+      const regular =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      if (regular.test(email)) {
+        isValid = true;
+      } else {
+        isValid = false;
+      }
+    } else {
+      isValid = false;
+    }
+    setInputValid({ ...isInputValid, [name]: isValid });
+    return isValid;
+  };
+  // --------------------------------------
+  // VALIDATION FUNCTION
+  // --------------------------------------
+
+  // --------------------------------------
+  // HANDLE INPUT FUNCTION
+  // --------------------------------------
+  const handleInputValid = (name, value) => {
+    switch (name) {
+      case "email":
+        emailValidation(value, name);
+        break;
+      case "fullName":
+        textValidation(value, name);
+        break;
+      case "identity":
+        numberValidation(value, name, IDENTITY_DIGIT);
+        break;
+      case "phoneNumber":
+        numberValidation(value, name, PHONE_DIGIT);
+        break;
     }
   };
 
   const handleInputChange = (event) => {
     const target = handleEvent(event);
     setUserInfo({ ...userInfo, [target.name]: target.value });
+    handleInputValid(target.name, target.value);
   };
-  const handlePayMethod = (event) => {
-    const { value } = handleEvent(event);
-    if (value === "Credit Card" || value === "Cash") {
-      setPayMethod(value);
+
+  const handleDateChange = (item) => {
+    setDate([item.selection]);
+    const { startDate, endDate } = date[0];
+    if (startDate.getUTCDate() !== endDate.getUTCDate()) {
+      setDateValid(false);
+    } else {
+      setDateValid(true);
     }
   };
 
-  const handleInputValid = (event) => {
-    const { name } = handleEvent(event);
-    let isValid = {
-      fullName: true,
-      email: true,
-      phoneNumber: true,
-      identity: true,
-    };
-    switch (name) {
-      case "fullName":
-        isValid.email = emailValidation(userInfo.email);
-        isValid.phoneNumber = numberValidation(
-          userInfo.phoneNumber,
-          PHONE_DIGIT
-        );
-        isValid.identity = numberValidation(userInfo.identity, IDENTITY_DIGIT);
-        break;
-      case "email":
-        isValid.fullName = textValidation(userInfo.fullName);
-        isValid.phoneNumber = numberValidation(
-          userInfo.phoneNumber,
-          PHONE_DIGIT
-        );
-        isValid.identity = numberValidation(userInfo.identity, IDENTITY_DIGIT);
-        break;
-      case "phoneNumber":
-        isValid.email = emailValidation(userInfo.email);
-        isValid.fullName = textValidation(userInfo.fullName);
-        isValid.identity = numberValidation(userInfo.identity, IDENTITY_DIGIT);
-        break;
-      case "identity":
-        isValid.email = emailValidation(userInfo.email);
-        isValid.fullName = textValidation(userInfo.fullName);
-        isValid.phoneNumber = numberValidation(
-          userInfo.phoneNumber,
-          PHONE_DIGIT
-        );
-        break;
-    }
-    setInputValid(isValid);
+  const handlePayMethod = (event) => {
+    const { value } = handleEvent(event);
+    setPayMethod(value);
   };
 
   const handleClearInput = (inputName, event) => {
     event.preventDefault();
     setUserInfo({ ...userInfo, [inputName]: "" });
   };
+  // --------------------------------------
+  // HANDLE INPUT FUNCTION
+  // --------------------------------------
 
   const reserveFinalCheck = () => {
-    // console.log("run");
+    let flag = true;
     const { startDate, endDate } = date[0];
-    if (startDate.getDate() === endDate.getDate()) {
-      return false;
-    }
-    const { fullName, email, identity, phoneNumber } = userInfo;
-    const _inputValid = { ...inputValid };
+    flag &= startDate.getUTCDate() === endDate.getUTCDate() ? false : true;
+    setDateValid(flag);
 
-    _inputValid.fullName = textValidation(fullName) ? true : false;
-    _inputValid.email = emailValidation(email) ? true : false;
-    _inputValid.identity = numberValidation(identity, IDENTITY_DIGIT)
+    const _isInputValid = { ...isInputValid };
+
+    _isInputValid.fullName = textValidation(userInfo.fullName, "fullName")
       ? true
       : false;
-    _inputValid.phoneNumber = numberValidation(phoneNumber, PHONE_DIGIT)
+
+    _isInputValid.email = emailValidation(userInfo.email, "email")
       ? true
       : false;
-    setInputValid(_inputValid);
+
+    _isInputValid.identity = numberValidation(
+      userInfo.identity,
+      "identity",
+      IDENTITY_DIGIT
+    )
+      ? true
+      : false;
+
+    _isInputValid.phoneNumber = numberValidation(
+      userInfo.phoneNumber,
+      "phoneNumber",
+      PHONE_DIGIT
+    )
+      ? true
+      : false;
+
+    setInputValid(_isInputValid);
+
     if (
-      _inputValid.fullName === false ||
-      _inputValid.email === false ||
-      _inputValid.identity === false ||
-      _inputValid.phoneNumber === false
+      _isInputValid.fullName === false ||
+      _isInputValid.email === false ||
+      _isInputValid.identity === false ||
+      _isInputValid.phoneNumber === false
     ) {
-      return false;
+      flag &= false;
+    } else {
+      flag &= true;
     }
+
+    flag &= payMethod === "" ? false : true;
+
+    return flag;
   };
 
   const handleReserve = () => {
+    const isAllValid = reserveFinalCheck();
+    setRenderError(!isAllValid);
     const reserveData = {
       user: userInfo,
       hotel: props.hotel._id,
@@ -278,14 +362,12 @@ const BookingForm = (props) => {
       price: totalPrice,
       payment: payMethod,
     };
-    const value = reserveFinalCheck();
-    console.log(value);
-    // post("/create-transaction", reserveData)
-    //   .then((result) => result.json())
-    //   .then((data) => {
-    //     console.log("data:", data);
-    //   })
-    //   .catch((err) => console.log("err:", err));
+    post("/create-transaction", reserveData)
+      .then((result) => result.json())
+      .then((data) => {
+        console.log("data:", data);
+      })
+      .catch((err) => console.log("err:", err));
   };
 
   return (
@@ -304,7 +386,7 @@ const BookingForm = (props) => {
             )} to ${format(date[0].endDate, "MM/dd/yyyy")}`}</span> */}
             <DateRange
               editableDateInputs={true}
-              onChange={(item) => setDate([item.selection])}
+              onChange={(item) => handleDateChange(item)}
               moveRangeOnFirstSelection={false}
               ranges={date}
               className="date datePick__calendar"
@@ -322,17 +404,17 @@ const BookingForm = (props) => {
             {/* form item */}
             <form className="userInfo_form--item">
               <>
-                {inputValid.fullName ? (
+                {isInputValid.fullName ? (
                   <label>Your Full Name:</label>
                 ) : (
-                  <article className="text-danger">
-                    Name cannot contain number
+                  <article className="errorText">
+                    Name can't contain numbers or be blank
                   </article>
                 )}
               </>
               <div
                 className={`userInfo_form--input ${
-                  inputValid.fullName ? `` : `border border-danger`
+                  isInputValid.fullName ? `` : `errorBorder`
                 }`}
               >
                 <input
@@ -340,7 +422,6 @@ const BookingForm = (props) => {
                   type="text"
                   name="fullName"
                   onChange={handleInputChange}
-                  onClick={handleInputValid}
                   placeholder="Full Name"
                 />
                 <button
@@ -354,15 +435,15 @@ const BookingForm = (props) => {
             {/* form item */}
             <form className="userInfo_form--item">
               <>
-                {inputValid.email ? (
+                {isInputValid.email ? (
                   <label>Your Email:</label>
                 ) : (
-                  <article className="text-danger">Invalid email</article>
+                  <article className="errorText">Invalid email</article>
                 )}
               </>
               <div
                 className={`userInfo_form--input ${
-                  inputValid.email ? `` : `border border-danger`
+                  isInputValid.email ? `` : `errorBorder`
                 }`}
               >
                 <input
@@ -370,7 +451,6 @@ const BookingForm = (props) => {
                   type="email"
                   name="email"
                   onChange={handleInputChange}
-                  onClick={handleInputValid}
                   placeholder="Email"
                 />
                 <button onClick={(event) => handleClearInput("email", event)}>
@@ -382,17 +462,17 @@ const BookingForm = (props) => {
             {/* form item */}
             <form className="userInfo_form--item">
               <>
-                {inputValid.phoneNumber ? (
+                {isInputValid.phoneNumber ? (
                   <label>Your Phone Number:</label>
                 ) : (
-                  <article className="text-danger">
+                  <article className="errorText">
                     Phone number must have 10 number digits
                   </article>
                 )}
               </>
               <div
                 className={`userInfo_form--input ${
-                  inputValid.phoneNumber ? `` : `border border-danger`
+                  isInputValid.phoneNumber ? `` : `errorBorder`
                 }`}
               >
                 <input
@@ -400,7 +480,6 @@ const BookingForm = (props) => {
                   type="tel"
                   name="phoneNumber"
                   onChange={handleInputChange}
-                  onClick={handleInputValid}
                   placeholder="Phone Number"
                 />
                 <button
@@ -414,17 +493,17 @@ const BookingForm = (props) => {
             {/* form item */}
             <form className="userInfo_form--item">
               <>
-                {inputValid.identity ? (
+                {isInputValid.identity ? (
                   <label>Your Identity Card Number:</label>
                 ) : (
-                  <article className="text-danger">
+                  <article className="errorText">
                     Identity number must have 12 number digits
                   </article>
                 )}
               </>
               <div
                 className={`userInfo_form--input ${
-                  inputValid.identity ? `` : `border border-danger`
+                  isInputValid.identity ? `` : `errorBorder`
                 }`}
               >
                 <input
@@ -432,7 +511,6 @@ const BookingForm = (props) => {
                   type="text"
                   name="identity"
                   onChange={handleInputChange}
-                  onClick={handleInputValid}
                   placeholder="Card Number"
                 />
                 <button
@@ -459,7 +537,7 @@ const BookingForm = (props) => {
         <h4 className="bookingInfo__title">
           <strong>Total Bill: ${totalPrice}</strong>
         </h4>
-        <div className="finalCheck__wrapper">
+        <section className="finalCheck__wrapper">
           <select onChange={handlePayMethod} className="finalCheck__options">
             <option value="">Select payment method</option>
             <option value="Credit Card">Credit Card</option>
@@ -468,7 +546,8 @@ const BookingForm = (props) => {
           <div className="finalCheck__button">
             <button onClick={handleReserve}>Reserve Now</button>
           </div>
-        </div>
+          {renderAllInputError()}
+        </section>
       </section>
     </section>
   );

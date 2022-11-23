@@ -2,10 +2,29 @@
   opacity: 0;
 }
 
+.errorText {
+  color: red !important;
+}
+
+.errorBorder {
+  border: 1px solid red !important;
+}
+
 .finalCheck__wrapper {
   display: flex;
   align-items: center;
   column-gap: 4rem;
+  height: 6rem;
+}
+
+.finalCheck__error {
+  border-radius: 5px;
+  height: fit-content;
+  padding: 0.5rem;
+}
+
+.finalCheck__error p {
+  margin: 0;
 }
 
 .finalCheck__button button {
