@@ -1,2 +1,2 @@
 Nội dung app:
-- hoàn thành kiểm ra lỗi khi người dùng điền form đặt phòng
+- sửa lỗi lọc phòng trống theo ngày

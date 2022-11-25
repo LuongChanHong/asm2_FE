@@ -56,7 +56,7 @@ const BookingForm = (props) => {
       post("/get-rooms-by-date", { date: date, hotel: props.hotel })
         .then((result) => result.json())
         .then((rooms) => {
-          // console.log("rooms:", rooms);
+          console.log("rooms:", rooms);
           setEmptyRooms(rooms);
         })
         .catch((err) => {
