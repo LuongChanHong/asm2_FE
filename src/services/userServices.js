@@ -7,9 +7,9 @@ export class UserService extends baseService {
   logIn = (userInfo) => {
     return this.post(`/login`, userInfo);
   };
-  // signUp = (thongTinDangKi) => {
-  //     return this.post("api/QuanLyNguoiDung/DangKy", thongTinDangKi);
-  // };
+  signUp = (userInfo) => {
+    return this.post("/signup", userInfo);
+  };
   // getInforUser = () => {
   //     return this.post("api/QuanLyNguoiDung/ThongTinNguoiDung");
   // };

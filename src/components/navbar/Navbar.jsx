@@ -6,6 +6,7 @@ import SignupButton from "../button/signup/SignupButton";
 import TransactionButton from "../button/transaction/TransactionButton";
 import LoginButton from "../button/login/LoginButton";
 import LogoutButton from "../button/logout/LogoutButton";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const [user, setUser] = useState(
@@ -14,6 +15,9 @@ const Navbar = () => {
   useEffect(() => {
     if (localStorage.currentUser) setUser(JSON.parse(localStorage.currentUser));
   }, [localStorage.currentUser]);
+
+  const { loginUser } = useSelector((state) => state.user);
+  // console.log("loginUser:", loginUser);
 
   return (
     <div className="navbar">

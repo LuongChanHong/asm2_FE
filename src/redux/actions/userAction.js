@@ -17,3 +17,16 @@ export const logInAction = (loginInfo, callback) => {
     }
   };
 };
+
+export const signUpAction = (loginInfo, callback) => {
+  console.log("loginInfo:", loginInfo);
+  return async (dispatch) => {
+    try {
+      const result = await userService.signUp(loginInfo);
+      dispatch(createAction(USER_ACTION.SIGN_UP));
+      callback();
+    } catch (err) {
+      console.log("err:", err);
+    }
+  };
+};

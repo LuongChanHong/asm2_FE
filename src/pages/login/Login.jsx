@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import "./login.css";
 
@@ -21,8 +21,6 @@ const Login = () => {
 
   localStorage.removeItem("currentUser");
 
-  const homePageNavigate = () => navigate("/home");
-
   const handleChange = (event) => {
     const target = event.target;
     const name = target.name;
@@ -35,8 +33,7 @@ const Login = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // console.log("input:", input);
-    const action = logInAction(input, homePageNavigate);
-    dispatch(action);
+    dispatch(logInAction(input, () => navigate("/home")));
     // const login = async () => {
     //   try {
     //     const response = await post("/login", input);

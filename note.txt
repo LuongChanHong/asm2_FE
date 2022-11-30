@@ -1,3 +1,2 @@
-
 Nội dung app:
-- dựng redux store và login action
+- dựng signup action redux 

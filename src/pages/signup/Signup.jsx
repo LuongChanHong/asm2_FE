@@ -1,16 +1,19 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 import { post } from "../../utils/fetch";
 
 import Navbar from "../../components/navbar/Navbar";
+import { signUpAction } from "../../redux/actions/userAction";
 
 const Signup = () => {
   const [input, setInput] = useState({ email: "", password: "" });
   const [signupError, setSignupError] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (event) => {
     const target = event.target;
@@ -24,15 +27,16 @@ const Signup = () => {
   const handleSubmit = (event) => {
     // event.preventDefault();
     // console.log("input:", input);
-    const signup = async () => {
-      try {
-        await post("/signup", input);
-        navigate("/login");
-      } catch (err) {
-        setSignupError(true);
-      }
-    };
-    signup();
+    dispatch(signUpAction(input, () => navigate("/login")));
+    // const signup = async () => {
+    //   try {
+    //     await post("/signup", input);
+    //     navigate("/login");
+    //   } catch (err) {
+    //     setSignupError(true);
+    //   }
+    // };
+    // signup();
   };
 
   return (
