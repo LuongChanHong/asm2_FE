@@ -52,16 +52,16 @@ const BookingForm = (props) => {
   useEffect(() => {
     const startDate = date[0].startDate;
     const endDate = date[0].endDate;
+    const getRooms = async () => {
+      const response = await post("/get-rooms-by-date", {
+        date: date,
+        hotel: props.hotel,
+      });
+      // setEmptyRooms(rooms);
+      console.log("response:", response.data);
+    };
     if (endDate.getTime() != startDate.getTime()) {
-      post("/get-rooms-by-date", { date: date, hotel: props.hotel })
-        .then((result) => result.json())
-        .then((rooms) => {
-          console.log("rooms:", rooms);
-          setEmptyRooms(rooms);
-        })
-        .catch((err) => {
-          console.log("err:", err);
-        });
+      getRooms();
     }
   }, [date]);
 

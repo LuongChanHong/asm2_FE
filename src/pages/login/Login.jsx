@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 import "./login.css";
-import { post } from "../../utils/fetch";
 
 import Navbar from "../../components/navbar/Navbar";
+import { post } from "../../utils/fetch";
+import { logInAction } from "../../redux/actions/userAction";
 
 const Login = () => {
   const [input, setInput] = useState({
@@ -12,9 +14,14 @@ const Login = () => {
     password: "456",
   });
   // const [user, setUser] = useState({});
-  const [loginError, setLoginError] = useState(false);
+  const [isLoginError, setLoginError] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  localStorage.removeItem("currentUser");
+
+  const homePageNavigate = () => navigate("/home");
 
   const handleChange = (event) => {
     const target = event.target;
@@ -28,22 +35,26 @@ const Login = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // console.log("input:", input);
-    post("/login", input)
-      .then((response) => response.json())
-      .then(() => {
-        // console.log("data:", data);
-        // set user để navbar hiện user hiện tại
-        localStorage.setItem(
-          "currentUser",
-          JSON.stringify({ email: input.email })
-        );
-        setLoginError(false);
-        navigate("/home");
-      })
-      .catch((err) => {
-        console.log("err:", err);
-        setLoginError(true);
-      });
+    const action = logInAction(input, homePageNavigate);
+    dispatch(action);
+    // const login = async () => {
+    //   try {
+    //     const response = await post("/login", input);
+    //     // setEmptyRooms(rooms);
+    //     if (response.data !== null) {
+    //       // set user để navbar hiện user hiện tại
+    //       localStorage.setItem(
+    //         "currentUser",
+    //         JSON.stringify({ email: input.email })
+    //       );
+    //       navigate("/home");
+    //     }
+    //   } catch (err) {
+    //     setLoginError(true);
+    //   }
+    // };
+
+    // login();
   };
 
   return (
@@ -70,10 +81,8 @@ const Login = () => {
                 onChange={handleChange}
                 value={input.password}
               />
-              {loginError ? (
+              {isLoginError && (
                 <span className="text-danger">wrong email or password</span>
-              ) : (
-                <></>
               )}
               <button
                 onClick={handleSubmit}

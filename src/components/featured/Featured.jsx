@@ -31,17 +31,26 @@ const Featured = () => {
   const [hotelByCity, setHotelByCity] = useState([]);
 
   useEffect(() => {
-    get("/get-hotels-by-area")
-      .then((result) => result.json())
-      .then((data) => {
-        // console.log("data.hotelByCity:", data.hotelByCity);
-        setHotelByCity(data.hotelByCity);
-      })
-      .catch((err) => console.log("err:", err));
+    const getData = async () => {
+      try {
+        const response = await get("/get-hotels-by-area");
+        // console.log(response);
+        setHotelByCity(response.data.hotelByCity);
+      } catch (err) {
+        console.log("err:", err);
+      }
+    };
+    getData();
   }, []);
 
   return (
-    <section className="featured">{renderFeaturedList(hotelByCity)}</section>
+    <section className="featured">
+      {hotelByCity ? (
+        <>{renderFeaturedList(hotelByCity)}</>
+      ) : (
+        <h5>Loading...</h5>
+      )}
+    </section>
   );
 };
 

@@ -37,16 +37,26 @@ const FeaturedProperties = () => {
   const [ratingHotels, setRatingHotels] = useState([]);
 
   useEffect(() => {
-    get("/get-hotels-by-area")
-      .then((result) => result.json())
-      .then((data) => {
-        // console.log("data:", data);
-        setRatingHotels(data.hotelByRating);
-      })
-      .catch((err) => console.log("err:", err));
+    const getData = async () => {
+      try {
+        const response = await get("/get-hotels-by-area");
+        setRatingHotels(response.data.hotelByRating);
+      } catch (err) {
+        console.log("err:", err);
+      }
+    };
+    getData();
   }, []);
 
-  return <div className="fp">{renderPropertiList(ratingHotels)}</div>;
+  return (
+    <div className="fp">
+      {ratingHotels ? (
+        <>{renderPropertiList(ratingHotels)}</>
+      ) : (
+        <h5>Loading...</h5>
+      )}
+    </div>
+  );
 };
 
 export default FeaturedProperties;

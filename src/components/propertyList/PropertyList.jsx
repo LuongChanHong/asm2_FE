@@ -31,16 +31,22 @@ const PropertyList = () => {
   const [property, setProperty] = useState([]);
 
   useEffect(() => {
-    get("/get-hotels-by-area")
-      .then((result) => result.json())
-      .then((data) => {
-        // console.log("data.propertyByType:", data.propertyByType);
-        setProperty(data.propertyByType);
-      })
-      .catch((err) => console.log("err:", err));
+    const getData = async () => {
+      try {
+        const response = await get("/get-hotels-by-area");
+        setProperty(response.data.propertyByType);
+      } catch (err) {
+        console.log("err:", err);
+      }
+    };
+    getData();
   }, []);
 
-  return <div className="pList">{renderPropertyList(property)}</div>;
+  return (
+    <div className="pList">
+      {property ? <>{renderPropertyList(property)}</> : <h5>Loading...</h5>}
+    </div>
+  );
 };
 
 export default PropertyList;

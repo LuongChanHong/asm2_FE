@@ -1,2 +1,3 @@
+
 Nội dung app:
-- sửa lỗi lọc phòng trống theo ngày
+- dựng redux store và login action

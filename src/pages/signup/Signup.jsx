@@ -24,19 +24,15 @@ const Signup = () => {
   const handleSubmit = (event) => {
     // event.preventDefault();
     // console.log("input:", input);
-    post("/signup", input)
-      .then((response) => response.json())
-      .then((data) => {
-        // console.log("data:", data);
-        setSignupError(false);
-        // set user để navbar hiện user hiện tại
-        localStorage.setItem("currentUser", JSON.stringify(data));
-        navigate("/home");
-      })
-      .catch((err) => {
-        console.log("err:", err);
+    const signup = async () => {
+      try {
+        await post("/signup", input);
+        navigate("/login");
+      } catch (err) {
         setSignupError(true);
-      });
+      }
+    };
+    signup();
   };
 
   return (

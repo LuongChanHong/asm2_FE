@@ -1,14 +1,16 @@
-import "./list.css";
+import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import { DateRange } from "react-date-range";
+
 import Navbar from "../../components/navbar/Navbar";
 import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
 import MailList from "../../components/mailList/MailList";
 import SearchItem from "../../components/searchItem/SearchItem";
 
-import { useLocation } from "react-router-dom";
-import { useState } from "react";
-import { format } from "date-fns";
-import { DateRange } from "react-date-range";
+import "./list.css";
+import { post } from "../../utils/fetch";
 
 const renderHotelsList = (list) => {
   // console.log("list:", list);
@@ -26,14 +28,37 @@ const renderHotelsList = (list) => {
 };
 
 const List = () => {
-  const location = useLocation();
-  const [destination, setDestination] = useState(location.state.destination);
-  const [date, setDate] = useState(location.state.date);
-  const [options, setOptions] = useState(location.state.options);
-  const [hotels, setHotels] = useState(location.state.hotels);
+  // const location = useLocation();
+
+  const [date, setDate] = useState();
+  const [destination, setDestination] = useState();
+  const [options, setOptions] = useState();
+
+  const [hotels, setHotels] = useState([]);
   const [openDate, setOpenDate] = useState(false);
 
-  // console.log("location:", location);
+  console.log(date);
+  // console.log(destination);
+  // console.log(options);
+
+  useEffect(() => {
+    // console.log("run");
+
+    const searchHotel = async () => {
+      try {
+        const response = await post("/search-hotels", {
+          destination,
+          date,
+          options,
+        });
+        console.log("response:", response.data);
+        setHotels(response.data);
+      } catch (err) {
+        console.log("err:", err);
+      }
+    };
+    searchHotel();
+  }, []);
 
   return (
     <div>
@@ -55,7 +80,7 @@ const List = () => {
               )} to ${format(date[0].endDate, "MM/dd/yyyy")}`}</span>
               {openDate && (
                 <DateRange
-                  onChange={(item) => setDate([item.selection])}
+                  onChange={(item) => (date = [item.selection])}
                   minDate={new Date()}
                   ranges={date}
                 />

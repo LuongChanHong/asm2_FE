@@ -12,7 +12,7 @@ import {
   faCircleXmark,
   faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { get } from "../../utils/fetch";
@@ -26,13 +26,11 @@ const Hotel = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    get(`/get-hotel-by-id/`, id)
-      .then((result) => result.json())
-      .then((hotel) => {
-        // console.log("hotel:", hotel);
-        setHotel(hotel);
-      })
-      .catch((err) => console.log("err:", err));
+    const getHotel = async () => {
+      const response = await get(`/get-hotel-by-id/`, id);
+      setHotel(response.data);
+    };
+    getHotel();
   }, []);
 
   let photos = [];

@@ -14,8 +14,6 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
-import { post } from "../../utils/fetch";
-
 import "./header.css";
 
 const Header = ({ type }) => {
@@ -35,7 +33,6 @@ const Header = ({ type }) => {
     room: 1,
   });
   const [errorDate, setErrorDate] = useState(false);
-  const [errorDestination, setErrorDestination] = useState(false);
   const [hotels, setHotels] = useState([]);
 
   const navigate = useNavigate();
@@ -70,35 +67,13 @@ const Header = ({ type }) => {
   const handleSearch = () => {
     setOpenDate(false);
     setOpenOptions(false);
-    const startDate = { ...date[0] }.startDate;
-    const endDate = { ...date[0] }.endDate;
-    const requestData = { date, options, destination };
+
     // convert date object to number then compare
-    if (startDate.getTime() === endDate.getTime()) {
+    if (date[0].startDate.getTime() === date[0].endDate.getTime()) {
       setErrorDate(true);
-    } else {
-      post("/search-hotels", requestData)
-        .then((result) => result.json())
-        .then((hotels) => {
-          // console.log("hotels:", hotels);
-          setHotels(hotels);
-          if (hotels.length > 0) {
-            // redirect to found hotel list page
-            // and send found hotels list
-            const searchedData = {
-              destination: destination,
-              date: date,
-              options: options,
-              hotels: hotels,
-            };
-            navigate(`/hotels`, { state: searchedData });
-          }
-        })
-        .catch((err) => console.log("err:", err));
     }
-    // console.log("date:", date);
-    // console.log("destination:", destination);
-    // console.log("options:", options);
+
+    navigate(`/hotels`);
   };
 
   return (
@@ -156,11 +131,6 @@ const Header = ({ type }) => {
                     onClick={() => handleInputOnClick("destination")}
                   />
                 </div>
-                {errorDestination ? (
-                  <span className="searchWanring">location error</span>
-                ) : (
-                  <></>
-                )}
               </section>
               {/* date input*/}
               <section className="headerSearchWrap">
