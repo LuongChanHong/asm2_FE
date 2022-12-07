@@ -14,7 +14,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import { get } from "../../utils/fetch";
 
@@ -26,6 +26,7 @@ const Hotel = () => {
 
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loginUser);
 
   useEffect(() => {
@@ -33,6 +34,7 @@ const Hotel = () => {
       const response = await get(`/get-hotel-by-id/`, id);
       setHotel(response.data);
     };
+
     getHotel();
   }, []);
 

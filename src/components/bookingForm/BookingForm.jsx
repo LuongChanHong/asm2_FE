@@ -7,11 +7,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
 import { DateRange } from "react-date-range";
 import { format, getDate } from "date-fns";
-import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-import { post } from "../../utils/fetch";
-import { findByEmailAction } from "../../redux/actions/userAction";
+import { get, post } from "../../utils/fetch";
 
 import "./bookingForm.css";
 
@@ -28,6 +26,7 @@ const BookingForm = (props) => {
   ]);
   const [emptyRooms, setEmptyRooms] = useState([]);
   const [bookedRooms, setBookedRooms] = useState([]);
+  const [roomsOfHotel, setRoomsOfHotel] = useState([]);
   const [userInfo, setUserInfo] = useState({});
   const [isInputValid, setInputValid] = useState({
     fullName: true,
@@ -40,9 +39,8 @@ const BookingForm = (props) => {
   const [payMethod, setPayMethod] = useState("");
   let [totalPrice, setTotalPrice] = useState(0);
 
-  const dispatch = useDispatch();
-
   const user = useSelector((state) => state.user.loginUser);
+
   useEffect(() => {
     setUserInfo(user);
   }, [user]);
@@ -50,16 +48,12 @@ const BookingForm = (props) => {
   useEffect(() => {
     const startDate = date[0].startDate;
     const endDate = date[0].endDate;
-    const getRooms = async () => {
-      const response = await post("/get-rooms-by-date", {
-        date: date,
-        hotel: props.hotel,
-      });
-      // setEmptyRooms(rooms);
-      console.log("response:", response.data);
+    const getRoomsOfHotel = async () => {
+      const result = await get("/get-rooms-of-hotel/", props.hotel._id);
+      setRoomsOfHotel(result.data);
     };
     if (endDate.getTime() != startDate.getTime()) {
-      getRooms();
+      getRoomsOfHotel();
     }
   }, [date]);
 
