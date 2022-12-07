@@ -13,11 +13,14 @@ import { DateRange } from "react-date-range";
 import { useState } from "react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 import "./header.css";
 
+import { inputSearchAction } from "../../redux/actions/userAction";
+
 const Header = ({ type }) => {
-  const [destination, setDestination] = useState("");
+  const [destination, setDestination] = useState("Ho Chi Minh");
   const [openDate, setOpenDate] = useState(false);
   const [date, setDate] = useState([
     {
@@ -36,6 +39,7 @@ const Header = ({ type }) => {
   const [hotels, setHotels] = useState([]);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleOption = (name, operation) => {
     setOptions((prev) => {
@@ -71,9 +75,16 @@ const Header = ({ type }) => {
     // convert date object to number then compare
     if (date[0].startDate.getTime() === date[0].endDate.getTime()) {
       setErrorDate(true);
+    } else {
+      dispatch(
+        inputSearchAction({
+          date: date[0],
+          destination: destination,
+          options: options,
+        })
+      );
+      navigate(`/hotels`);
     }
-
-    navigate(`/hotels`);
   };
 
   return (
@@ -123,13 +134,15 @@ const Header = ({ type }) => {
               <section className="headerSearchWrap">
                 <div className="headerSearchItem">
                   <FontAwesomeIcon icon={faBed} className="headerIcon" />
-                  <input
-                    type="text"
-                    placeholder="Where are you going?"
-                    className="headerSearchInput"
+                  <select
+                    className="headerSearch__select"
                     onChange={(e) => setDestination(e.target.value)}
                     onClick={() => handleInputOnClick("destination")}
-                  />
+                  >
+                    <option value="Ho Chi Minh">Hồ Chí Minh</option>
+                    <option value="Da Nang">Đà Nẵng</option>
+                    <option value="Ha Noi">Hà Nội</option>
+                  </select>
                 </div>
               </section>
               {/* date input*/}
@@ -163,7 +176,6 @@ const Header = ({ type }) => {
                   <></>
                 )}
               </section>
-
               {/* person input */}
               <div className="headerSearchItem">
                 <FontAwesomeIcon icon={faPerson} className="headerIcon" />

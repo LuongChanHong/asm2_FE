@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 import Featured from "../../components/featured/Featured";
 import FeaturedProperties from "../../components/featuredProperties/FeaturedProperties";
@@ -11,12 +12,6 @@ import PropertyList from "../../components/propertyList/PropertyList";
 import "./home.css";
 
 const Home = () => {
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (!localStorage.currentUser) {
-      navigate("/login");
-    }
-  });
   return (
     <div>
       <Navbar />

@@ -10,15 +10,9 @@ export class UserService extends baseService {
   signUp = (userInfo) => {
     return this.post("/signup", userInfo);
   };
-  // getInforUser = () => {
-  //     return this.post("api/QuanLyNguoiDung/ThongTinNguoiDung");
-  // };
-  // updateInfor = (thongTinNguoiDung) => {
-  //     return this.put(
-  //         `api/QuanLyNguoiDung/CapNhatThongTinNguoiDung`,
-  //         thongTinNguoiDung
-  //     );
-  // };
+  findByEmail = (email) => {
+    return this.post("/find-user-by-email", email);
+  };
 }
 
 export const userService = new UserService();

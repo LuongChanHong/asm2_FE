@@ -12,8 +12,9 @@ import {
   faCircleXmark,
   faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
-import { useContext, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import { get } from "../../utils/fetch";
 
@@ -24,6 +25,8 @@ const Hotel = () => {
   const [isFormOpen, setFormOpen] = useState(false);
 
   const { id } = useParams();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user.loginUser);
 
   useEffect(() => {
     const getHotel = async () => {
@@ -63,9 +66,17 @@ const Hotel = () => {
   }
   // console.log("photos:", photos);
 
-  const handleOpen = (i) => {
+  const handleImageOpen = (i) => {
     setSlideNumber(i);
     setSliderOpen(true);
+  };
+
+  const handleFormOpen = () => {
+    if (!user.email) {
+      navigate("/login");
+    } else {
+      setFormOpen(!isFormOpen);
+    }
   };
 
   const handleMove = (direction) => {
@@ -127,7 +138,7 @@ const Hotel = () => {
             {photos.map((photo, i) => (
               <div className="hotelImgWrapper" key={i}>
                 <img
-                  onClick={() => handleOpen(i)}
+                  onClick={() => handleImageOpen(i)}
                   src={photo.src}
                   alt=""
                   className="hotelImg"
@@ -151,9 +162,7 @@ const Hotel = () => {
               <h2>
                 <b>${hotel.cheapestPrice}</b> (1 nights)
               </h2>
-              <button onClick={() => setFormOpen(!isFormOpen)}>
-                Reserve or Book Now!
-              </button>
+              <button onClick={handleFormOpen}>Reserve or Book Now!</button>
             </div>
           </div>
         </div>

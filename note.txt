@@ -1,2 +1,2 @@
 Nội dung app:
-- dựng signup action redux 
+- commit code trước khi sửa lại logic đặt phòng bằng form

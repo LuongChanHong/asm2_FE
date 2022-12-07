@@ -7,8 +7,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
 import { DateRange } from "react-date-range";
 import { format, getDate } from "date-fns";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { post } from "../../utils/fetch";
+import { findByEmailAction } from "../../redux/actions/userAction";
 
 import "./bookingForm.css";
 
@@ -37,17 +40,12 @@ const BookingForm = (props) => {
   const [payMethod, setPayMethod] = useState("");
   let [totalPrice, setTotalPrice] = useState(0);
 
+  const dispatch = useDispatch();
+
+  const user = useSelector((state) => state.user.loginUser);
   useEffect(() => {
-    const userEmail = JSON.parse(localStorage.currentUser);
-    post("/find-user-by-email", userEmail)
-      .then((result) => result.json())
-      .then((user) => {
-        // console.log("user:", user);
-        // setCurrentUser(user);
-        setUserInfo(user);
-      })
-      .catch((err) => console.log("err:", err));
-  }, []);
+    setUserInfo(user);
+  }, [user]);
 
   useEffect(() => {
     const startDate = date[0].startDate;

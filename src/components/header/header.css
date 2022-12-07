@@ -87,6 +87,13 @@
   gap: 10px;
 }
 
+.headerSearch__select {
+  border: none;
+}
+.headerSearch__select:focus {
+  outline: none;
+}
+
 .headerSearchInput {
   border: none;
   outline: none;

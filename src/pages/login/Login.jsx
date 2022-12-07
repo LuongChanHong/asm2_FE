@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import "./login.css";
 
 import Navbar from "../../components/navbar/Navbar";
-import { post } from "../../utils/fetch";
 import { logInAction } from "../../redux/actions/userAction";
 
 const Login = () => {
@@ -19,8 +18,6 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  localStorage.removeItem("currentUser");
-
   const handleChange = (event) => {
     const target = event.target;
     const name = target.name;
@@ -32,26 +29,7 @@ const Login = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // console.log("input:", input);
-    dispatch(logInAction(input, () => navigate("/home")));
-    // const login = async () => {
-    //   try {
-    //     const response = await post("/login", input);
-    //     // setEmptyRooms(rooms);
-    //     if (response.data !== null) {
-    //       // set user để navbar hiện user hiện tại
-    //       localStorage.setItem(
-    //         "currentUser",
-    //         JSON.stringify({ email: input.email })
-    //       );
-    //       navigate("/home");
-    //     }
-    //   } catch (err) {
-    //     setLoginError(true);
-    //   }
-    // };
-
-    // login();
+    dispatch(logInAction(input, () => navigate(-1)));
   };
 
   return (

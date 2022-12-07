@@ -11,6 +11,7 @@ import SearchItem from "../../components/searchItem/SearchItem";
 
 import "./list.css";
 import { post } from "../../utils/fetch";
+import { useSelector } from "react-redux";
 
 const renderHotelsList = (list) => {
   // console.log("list:", list);
@@ -28,35 +29,24 @@ const renderHotelsList = (list) => {
 };
 
 const List = () => {
-  // const location = useLocation();
-
-  const [date, setDate] = useState();
-  const [destination, setDestination] = useState();
-  const [options, setOptions] = useState();
+  const [searchInfo, setSearchInfo] = useState(
+    useSelector((state) => state.user.searchInfo)
+  );
 
   const [hotels, setHotels] = useState([]);
   const [openDate, setOpenDate] = useState(false);
 
-  console.log(date);
-  // console.log(destination);
-  // console.log(options);
+  const searchHotel = async () => {
+    try {
+      const response = await post("/search-hotels", searchInfo);
+      // console.log("response:", response.data);
+      setHotels(response.data);
+    } catch (err) {
+      console.log("err:", err);
+    }
+  };
 
   useEffect(() => {
-    // console.log("run");
-
-    const searchHotel = async () => {
-      try {
-        const response = await post("/search-hotels", {
-          destination,
-          date,
-          options,
-        });
-        console.log("response:", response.data);
-        setHotels(response.data);
-      } catch (err) {
-        console.log("err:", err);
-      }
-    };
     searchHotel();
   }, []);
 
@@ -70,19 +60,22 @@ const List = () => {
             <h1 className="lsTitle">Search</h1>
             <div className="lsItem">
               <label>Destination</label>
-              <input placeholder={destination} type="text" />
+              <input placeholder={searchInfo.destination} type="text" />
             </div>
             <div className="lsItem">
               <label>Check-in Date</label>
               <span onClick={() => setOpenDate(!openDate)}>{`${format(
-                date[0].startDate,
+                new Date(searchInfo.date.startDate),
                 "MM/dd/yyyy"
-              )} to ${format(date[0].endDate, "MM/dd/yyyy")}`}</span>
+              )} to ${format(
+                new Date(searchInfo.date.endDate),
+                "MM/dd/yyyy"
+              )}`}</span>
               {openDate && (
                 <DateRange
-                  onChange={(item) => (date = [item.selection])}
+                  onChange={(item) => (searchInfo.date = [item.selection])}
                   minDate={new Date()}
-                  ranges={date}
+                  ranges={searchInfo.date}
                 />
               )}
             </div>
@@ -93,13 +86,21 @@ const List = () => {
                   <span className="lsOptionText">
                     Min price <small>per night</small>
                   </span>
-                  <input type="number" className="lsOptionInput" />
+                  <input
+                    type="number"
+                    placeholder="0"
+                    className="lsOptionInput"
+                  />
                 </div>
                 <div className="lsOptionItem">
                   <span className="lsOptionText">
                     Max price <small>per night</small>
                   </span>
-                  <input type="number" className="lsOptionInput" />
+                  <input
+                    type="number"
+                    placeholder="999"
+                    className="lsOptionInput"
+                  />
                 </div>
                 <div className="lsOptionItem">
                   <span className="lsOptionText">Adult</span>
@@ -107,7 +108,7 @@ const List = () => {
                     type="number"
                     min={1}
                     className="lsOptionInput"
-                    placeholder={options.adult}
+                    placeholder={searchInfo.options.adult}
                   />
                 </div>
                 <div className="lsOptionItem">
@@ -116,7 +117,7 @@ const List = () => {
                     type="number"
                     min={0}
                     className="lsOptionInput"
-                    placeholder={options.children}
+                    placeholder={searchInfo.options.children}
                   />
                 </div>
                 <div className="lsOptionItem">
@@ -125,12 +126,12 @@ const List = () => {
                     type="number"
                     min={1}
                     className="lsOptionInput"
-                    placeholder={options.room}
+                    placeholder={searchInfo.options.room}
                   />
                 </div>
               </div>
             </div>
-            <button>Search</button>
+            <button onClick={searchHotel}>Search</button>
           </div>
           <>{renderHotelsList(hotels)}</>
         </div>
