@@ -8,4 +8,7 @@ export const get = (url, params) => {
   return axios.get(serverPath + url + params);
 };
 
-export const post = (url, jsonData) => axios.post(serverPath + url, jsonData);
+export const post = (url, jsonData) => {
+  // console.log("jsonData:", jsonData);
+  return axios.post(serverPath + url, jsonData);
+};

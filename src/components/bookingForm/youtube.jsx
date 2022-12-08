@@ -40,7 +40,6 @@ const Reserve = ({ data, setOpen, dates }) => {
         : selectedRooms.filter((item) => item !== value)
     );
   };
-  console.log(selectedRooms);
   const navigate = useNavigate();
   const handleClick = async () => {
     try {

@@ -24,7 +24,8 @@ const BookingForm = (props) => {
       key: "selection",
     },
   ]);
-  const [emptyRooms, setEmptyRooms] = useState([]);
+  const [datesInRange, setDatesInRange] = useState([]);
+
   const [bookedRooms, setBookedRooms] = useState([]);
   const [roomsOfHotel, setRoomsOfHotel] = useState([]);
   const [userInfo, setUserInfo] = useState({});
@@ -50,25 +51,50 @@ const BookingForm = (props) => {
     const endDate = date[0].endDate;
     const getRoomsOfHotel = async () => {
       const result = await get("/get-rooms-of-hotel/", props.hotel._id);
+      // console.log(result);
       setRoomsOfHotel(result.data);
     };
+    // calculate date range
+    const getDatesInRange = () => {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const date = new Date(start.getTime());
+
+      const dates = [];
+
+      while (date <= end) {
+        dates.push(new Date(date).getTime());
+        date.setDate(date.getDate() + 1);
+      }
+
+      setDatesInRange(dates);
+    };
+    // getRoomsOfHotel();
     if (endDate.getTime() != startDate.getTime()) {
       getRoomsOfHotel();
+      getDatesInRange();
+      console.log(roomsOfHotel);
     }
   }, [date]);
 
   const handleEvent = (event) => {
-    // console.log("event:", event.target.value);
-    return {
-      name: event.target.name,
-      value: event.target.value,
-      checked: event.target.checked,
-    };
+    // console.log("event:", event.target);
+    const target = event.target;
+    if (target.type === "checkbox") {
+      return {
+        value: target.value,
+        checked: target.checked,
+      };
+    } else {
+      return {
+        name: target.name,
+        value: target.value,
+      };
+    }
   };
 
   const calTotalPrice = (price, isBookingMore) => {
-    const { startDate, endDate } = date[0];
-    const bookingDays = endDate.getUTCDate() - startDate.getUTCDate() + 1;
+    const bookingDays = datesInRange.length;
     if (isBookingMore) {
       totalPrice += price * bookingDays;
     } else {
@@ -77,23 +103,36 @@ const BookingForm = (props) => {
     setTotalPrice(totalPrice);
   };
 
-  // Add picking room to list and calculate total bill
-  const handleRoomPicking = (event, id, price) => {
-    const { name, checked } = handleEvent(event);
-    const _bookedRooms = [...bookedRooms];
+  const isAvailable = (room) => {
+    const isFound = room.unAvailableDates.some((date) =>
+      datesInRange.includes(new Date(date).getTime())
+    );
+    return !isFound;
+  };
 
-    if (checked) {
-      _bookedRooms.push({ roomId: id, roomNumber: name });
-      calTotalPrice(price, checked);
-    } else {
-      _bookedRooms.forEach((room, index) => {
-        if (room.roomId === id && room.roomNumber === name) {
-          _bookedRooms.splice(index, 1);
-          calTotalPrice(price, checked);
-        }
-      });
-    }
-    setBookedRooms(_bookedRooms);
+  // Add picking room to list and calculate total bill
+  const handleRoomPicking = (event, price) => {
+    const { value, checked } = handleEvent(event);
+    // const _bookedRooms = [...bookedRooms];
+    setBookedRooms(
+      checked
+        ? [...bookedRooms, value]
+        : bookedRooms.filter((item) => item !== value)
+    );
+    calTotalPrice(price, checked);
+    // if (checked) {
+    //   _bookedRooms.push({ roomId: roomId, roomNumber: name });
+    //   // calTotalPrice(price, checked);
+    // } else {
+    //   _bookedRooms.forEach((room, index) => {
+    //     if (room.roomId === roomId && room.roomNumber === name) {
+    //       _bookedRooms.splice(index, 1);
+    //       // calTotalPrice(price, checked);
+    //     }
+    //   });
+    // }
+    // setBookedRooms(_bookedRooms);
+    // console.log(bookedRooms);
   };
 
   // --------------------------------------
@@ -117,15 +156,15 @@ const BookingForm = (props) => {
           </section>
           {/* Room checkboxs */}
           <section className="selectRoom__typeList--rooms">
-            {room.rooms.map((number, i) => (
+            {room.roomNumbers.map((item, i) => (
               <form key={i} className="selectRoom__typeList--checkbox">
-                <label htmlFor="">{number}</label>
+                <label htmlFor="">{item.number}</label>
                 <input
-                  name={number}
+                  name={item.number}
                   type="checkbox"
-                  onChange={(event) =>
-                    handleRoomPicking(event, room.roomId, room.price)
-                  }
+                  value={item._id}
+                  onChange={(event) => handleRoomPicking(event, room.price)}
+                  disabled={!isAvailable(item)}
                 />
               </form>
             ))}
@@ -343,23 +382,22 @@ const BookingForm = (props) => {
     return flag;
   };
 
-  const handleReserve = () => {
+  const handleReserve = async () => {
     const isAllValid = reserveFinalCheck();
     setRenderError(!isAllValid);
     const reserveData = {
       user: userInfo,
       hotel: props.hotel._id,
       rooms: bookedRooms,
-      date: date,
+      dates: datesInRange,
       price: totalPrice,
       payment: payMethod,
     };
-    post("/create-transaction", reserveData)
-      .then((result) => result.json())
-      .then((data) => {
-        console.log("data:", data);
-      })
-      .catch((err) => console.log("err:", err));
+    try {
+      await post("/reserve", reserveData);
+    } catch (err) {
+      console.log("err:", err);
+    }
   };
 
   return (
@@ -522,7 +560,7 @@ const BookingForm = (props) => {
         <h4 className="bookingInfo__title">
           <strong>Select Room</strong>
         </h4>
-        {emptyRooms.length > 0 ? renderAvailableRooms(emptyRooms) : <></>}
+        {roomsOfHotel.length > 0 ? renderAvailableRooms(roomsOfHotel) : <></>}
       </section>
       {/* PAYMENT AND RESERVATION */}
       <section className="finalCheck">

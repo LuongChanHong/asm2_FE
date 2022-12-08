@@ -1,2 +1,2 @@
 Nội dung app:
-- lấy được tất cả phòng của khách sạn được chọn
+- xử lí xong giao diện đăng kí phòng bằng form
