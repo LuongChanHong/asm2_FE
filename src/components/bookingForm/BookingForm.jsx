@@ -113,26 +113,12 @@ const BookingForm = (props) => {
   // Add picking room to list and calculate total bill
   const handleRoomPicking = (event, price) => {
     const { value, checked } = handleEvent(event);
-    // const _bookedRooms = [...bookedRooms];
     setBookedRooms(
       checked
         ? [...bookedRooms, value]
         : bookedRooms.filter((item) => item !== value)
     );
     calTotalPrice(price, checked);
-    // if (checked) {
-    //   _bookedRooms.push({ roomId: roomId, roomNumber: name });
-    //   // calTotalPrice(price, checked);
-    // } else {
-    //   _bookedRooms.forEach((room, index) => {
-    //     if (room.roomId === roomId && room.roomNumber === name) {
-    //       _bookedRooms.splice(index, 1);
-    //       // calTotalPrice(price, checked);
-    //     }
-    //   });
-    // }
-    // setBookedRooms(_bookedRooms);
-    // console.log(bookedRooms);
   };
 
   // --------------------------------------
