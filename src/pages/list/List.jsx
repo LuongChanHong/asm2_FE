@@ -13,21 +13,6 @@ import "./list.css";
 import { post } from "../../utils/fetch";
 import { useSelector } from "react-redux";
 
-const renderHotelsList = (list) => {
-  // console.log("list:", list);
-  if (list.length > 0) {
-    return (
-      <div className="listResult">
-        {list.map((item) => (
-          <SearchItem key={item._id} data={item} />
-        ))}
-      </div>
-    );
-  } else {
-    <h1>No hotel found</h1>;
-  }
-};
-
 const List = () => {
   const [searchInfo, setSearchInfo] = useState(
     useSelector((state) => state.user.searchInfo)
@@ -39,8 +24,10 @@ const List = () => {
   const searchHotel = async () => {
     try {
       const response = await post("/search-hotels", searchInfo);
-      // console.log("response:", response.data);
-      setHotels(response.data);
+      // console.log("response:", response);
+      if (response) {
+        setHotels(response.data);
+      }
     } catch (err) {
       console.log("err:", err);
     }
@@ -133,7 +120,14 @@ const List = () => {
             </div>
             <button onClick={searchHotel}>Search</button>
           </div>
-          <>{renderHotelsList(hotels)}</>
+          {/* <>{renderHotelsList(hotels)}</> */}
+          <div className="listResult">
+            {hotels.length == 0 ? (
+              <h1>Loading ...</h1>
+            ) : (
+              hotels.map((item) => <SearchItem key={item._id} data={item} />)
+            )}
+          </div>
         </div>
         <MailList />
         <Footer />

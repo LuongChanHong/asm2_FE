@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
 import { DateRange } from "react-date-range";
 import { format, getDate } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import { get, post } from "../../utils/fetch";
@@ -41,6 +42,7 @@ const BookingForm = (props) => {
   let [totalPrice, setTotalPrice] = useState(0);
 
   const user = useSelector((state) => state.user.loginUser);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setUserInfo(user);
@@ -381,6 +383,9 @@ const BookingForm = (props) => {
     };
     try {
       await post("/reserve", reserveData);
+      if (window.confirm("đặt phòng thàng công")) {
+        navigate("/");
+      }
     } catch (err) {
       console.log("err:", err);
     }

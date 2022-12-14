@@ -13,13 +13,14 @@ const SearchItem = ({ data }) => {
 
   return (
     <div className="searchItem">
-      <img src={data.photos[0]} alt="" className="siImg" />
+      <img src={data.photos[0]} alt={data.name} className="siImg" />
       <div className="siDesc">
         <h1 className="siTitle">{data.name}</h1>
         <span className="siDistance">{data.distance} from center</span>
         {/* <span className="siTaxiOp">{tag}</span> */}
         <span className="siSubtitle">{data.desc}</span>
-        <span className="siFeatures">{data.type}</span>
+        {/* <span className="siFeatures">{data.type}</span> */}
+
         {/* If can cancel */}
         {/* {free_cancel ? (
           <div>

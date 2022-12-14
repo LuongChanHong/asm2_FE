@@ -1,2 +1,2 @@
 Nội dung app:
-- đang tìm các khách sạn chứa các phòng checkout vừa tìm được
+- hoàn thành chức năng tìm khách sạn theo yêu cầu
