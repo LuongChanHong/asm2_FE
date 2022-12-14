@@ -384,7 +384,7 @@ const BookingForm = (props) => {
     try {
       await post("/reserve", reserveData);
       if (window.confirm("đặt phòng thàng công")) {
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (err) {
       console.log("err:", err);

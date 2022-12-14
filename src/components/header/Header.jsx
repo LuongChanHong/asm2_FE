@@ -14,6 +14,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 import "./header.css";
 
@@ -40,6 +41,7 @@ const Header = ({ type }) => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const handleOption = (name, operation) => {
     setOptions((prev) => {
@@ -91,7 +93,9 @@ const Header = ({ type }) => {
     <div className="header">
       <div
         className={
-          type === "list" ? "headerContainer listMode" : "headerContainer"
+          type === "list" || location.pathname == "/dashboard"
+            ? "headerContainer listMode"
+            : "headerContainer"
         }
       >
         <div className="headerList">
@@ -116,7 +120,7 @@ const Header = ({ type }) => {
             <span>Airport taxis</span>
           </div>
         </div>
-        {type !== "list" && (
+        {(type === "list" || location.pathname != "/dashboard") && (
           <>
             <h1 className="headerTitle">
               A lifetime of discounts? It's Genius.
