@@ -67,7 +67,7 @@ const Dashboard = () => {
   return (
     <section>
       <Navbar />
-      <Header />
+      <Header type={"dashboard"} />
 
       <section className="transac__tb__container">
         <h3>Your Transactions</h3>

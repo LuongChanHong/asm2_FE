@@ -42,6 +42,7 @@ const Header = ({ type }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  console.log(type);
 
   const handleOption = (name, operation) => {
     setOptions((prev) => {
@@ -93,12 +94,12 @@ const Header = ({ type }) => {
     <div className="header">
       <div
         className={
-          type === "list" || location.pathname == "/dashboard"
-            ? "headerContainer listMode"
-            : "headerContainer"
+          type === "home" ? "headerContainer" : "headerContainer searchMode"
         }
       >
-        <div className="headerList">
+        <div
+          className={type === "home" ? "headerList searchMode" : "headerList"}
+        >
           <div className="headerListItem active">
             <FontAwesomeIcon icon={faBed} />
             <span>Stays</span>
@@ -120,7 +121,7 @@ const Header = ({ type }) => {
             <span>Airport taxis</span>
           </div>
         </div>
-        {(type === "list" || location.pathname != "/dashboard") && (
+        {type === "home" && (
           <>
             <h1 className="headerTitle">
               A lifetime of discounts? It's Genius.
