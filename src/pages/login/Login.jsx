@@ -29,7 +29,12 @@ const Login = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(logInAction(input, () => navigate(-1)));
+    const err = dispatch(logInAction(input, () => navigate(-1)));
+    if (err) {
+      err.then((res) => {
+        setLoginError(true);
+      });
+    }
   };
 
   return (

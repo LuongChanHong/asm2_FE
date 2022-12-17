@@ -9,7 +9,7 @@ export const logInAction = (loginInfo, callback) => {
       dispatch(createAction(USER_ACTION.LOGIN, result.data));
       callback();
     } catch (err) {
-      console.log("err:", err);
+      return err.response.statusText;
     }
   };
 };
